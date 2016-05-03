@@ -56,7 +56,7 @@ parse = foldl' (\acc x -> force $ case sepByTab x of { word:num:cat:
 getEmo :: M.Map String (Emotion EmoData) -> [String] -> Emotion EmoStat
 getEmo emodata str = foldl' (\acc x -> case M.lookup x emodata of
                                          Just emo -> (show x ++ " has emodata " ++ show emo)  `trace` toEmoStat emo <> acc 
-                                         Nothing -> ("the word " ++ show x ++ " is not in database") `trace` acc) mempty str 
+                                         Nothing -> ("the word " ++ show x ++ " is not in the database") `trace` acc) mempty str 
 emoAvg :: Emotion EmoStat -> Emotion EmoStat
 emoAvg x = (\x -> case x of
                     EmoStat count val -> case count of
