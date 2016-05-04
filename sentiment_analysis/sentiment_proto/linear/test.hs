@@ -22,8 +22,11 @@ data Emotion a =
             , fear :: a
             , disgust :: a
             } deriving (Show, Generic, NFData, Functor)
-data EmoStat = EmoStat Count Double deriving (Show, Generic, NFData)
-             
+data EmoStat = EmoStat Count Double deriving (Generic, NFData)
+
+
+instance Show EmoStat where
+    show (EmoStat count val) = show val
 instance Monoid EmoStat where
     mempty = EmoStat 0 0
     mappend (EmoStat count1 val1) (EmoStat count2 val2) = EmoStat (count1 + count2) (val1 + val2)
@@ -40,18 +43,18 @@ sepByTab = splitWhen ((==) '\t')
 
 parse :: [String] -> M.Map String (Emotion EmoData)
 parse = foldl' (\acc x -> force $ case sepByTab x of { word:num:cat:
-                                                 hap_mean:hap_sd:hap_sex:
-                                                 ang_mean:ang_sd:ang_sex:
-                                                 sad_mean:sad_sd:sad_sex:
-                                                 fear_mean:fear_sd:fear_sex:
-                                                 dis_mean:dis_sd:dis_sex:_ -> M.insert (filter (/= ' ') word) (Emotion { happiness = EmoData (read hap_mean) (read hap_sd)
-                                                                                                            , anger = EmoData (read ang_mean) (read ang_sd)
-                                                                                                            , sadness = EmoData (read sad_mean) (read sad_sd)
-                                                                                                            , fear = EmoData (read fear_mean) (read fear_sd)
-                                                                                                            , disgust = EmoData (read dis_mean) (read dis_sd)
-                                                                                                            }) acc
-                                             ; _ -> error $ "unrecognized data at: " ++ show x
-                                             }) M.empty . filter (/= "")
+                                                       hap_mean:hap_sd:hap_sex:
+                                                       ang_mean:ang_sd:ang_sex:
+                                                       sad_mean:sad_sd:sad_sex:
+                                                       fear_mean:fear_sd:fear_sex:
+                                                       dis_mean:dis_sd:dis_sex:_ -> M.insert (filter (/= ' ') word) (Emotion { happiness = EmoData (read hap_mean) (read hap_sd)
+                                                                                                                             , anger = EmoData (read ang_mean) (read ang_sd)
+                                                                                                                             , sadness = EmoData (read sad_mean) (read sad_sd)
+                                                                                                                             , fear = EmoData (read fear_mean) (read fear_sd)
+                                                                                                                             , disgust = EmoData (read dis_mean) (read dis_sd)
+                                                                                                                             }) acc
+                                                     ; _ -> error $ "unrecognized data at: " ++ show x
+                                                     }) M.empty . filter (/= "")
 
 getEmo :: M.Map String (Emotion EmoData) -> [String] -> Emotion EmoStat
 getEmo emodata str = foldl' (\acc x -> case M.lookup x emodata of
