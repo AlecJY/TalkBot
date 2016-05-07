@@ -8,6 +8,7 @@ SET LINKER=%TOOLKITPATH%LINK.exe
 SET LINKERPARAM=/debug /subsystem:console /entry:%ENTRY% /out:%ENTRY%.exe %INCLUDELIBS%
 SET COMPILEPATH=%~dp0
 SET OUTPUTPATH=%~dp0
+SET COMMONINCLUDE=/I%COMPILEPATH%common
 echo submodule tokenization
 tokenization/make.bat
 echo submodule sentiment_analysis

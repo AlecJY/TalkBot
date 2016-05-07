@@ -1,5 +1,5 @@
 .386
-.MODEL flat
+.MODEL flat, stdcall
 .data
 
 TOKEN_LIST_BODY STRUCT
@@ -22,9 +22,9 @@ TOKEN_LIST_CURSOR ENDS
 .code
 ; Tokenize accepts a string with space separated words, then 
 ; list: a pointer to TOKEN_LIST that is returned by the TokenListNew() function
-; str: a null terminated string
+; input: a null terminated string
 ;	
-Tokenize PROTO, list : DWORD, str : PTR BYTE
+Tokenize PROTO, list : DWORD, input : PTR BYTE
 
 ; TokenListNew allocates a TOKEN_LIST
 TokenListNew PROTO
@@ -33,10 +33,10 @@ TokenListDelete PROTO, list : DWORD
 ; TokenListCursorNew returns a TOKEN_LIST_CURSOR that points to the beginning of the list
 TokenListCursorNew PROTO, list : DWORD
 ; TokenListCursorDelete deallocates the cursor ptr, if cursor is a NULL pointer, no operation is performed
-TokenListCursrDelete PROTO, cursor : DWORD
+TokenListCursorDelete PROTO, cursor : DWORD
 ; TokenListCursorGetItem : return the token ptr that the cursor is pointing to
 TokenListCursorGetItem PROTO, cursor : DWORD
-; TokenListCursorPriv : return a pointer to TOKEN_LIST_CURSOR that points to the previous item in the TOKEN_LIST. If the previous item does not exist, than a NULL ptr is returned
+; TokenListCursorPriv : No return value. Destructively modify the pointer to TOKEN_LIST_CURSOR to the previous item. If the previous item does not exist, then the content to which cursor points to does not change at all.
 TokenListCursorPriv PROTO, cursor : DWORD
-; TokenListCursorNext : return a PTR TOKEN_LIST_CURSOR that points to the next item in the TOKEN_LIST. If the next item does not exist, than a NULL ptr is returned
+; TokenListCursorNext :  No return value. Destructively modify the pointer to TOKEN_LIST_CURSOR to the next item. If the next item does not exist, then the content to which cursor points to does not change at all.
 TokenListCursorNext PROTO, cursor : DWORD
