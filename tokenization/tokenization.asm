@@ -3,9 +3,11 @@ INCLUDE crt.inc
 .code
 TokenListNew PROC
 	INVOKE malloc, SIZEOF TOKEN_LIST
-	push eax
-	INVOKE memset, eax, 0, SIZEOF TOKEN_LIST
-	pop eax
+	.IF eax != 0
+		push eax
+		INVOKE memset, eax, 0, SIZEOF TOKEN_LIST
+		pop eax
+	.ENDIF
 	ret
 TokenListNew ENDP
 
