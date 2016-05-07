@@ -6,5 +6,5 @@ SET ASEMBLERPARAM="/c /coff /Zi /Fl"
 SET LINKER=LINK.exe
 SET LINKERPARAM="/debug /subsystem:console /entry:%ENTRY% /out:%ENTRY%.exe %INCLUDELIBS%"
 
-REM submodule sentiment_analysis
+echo submodule sentiment_analysis
 sentiment_analysis/make.bat
