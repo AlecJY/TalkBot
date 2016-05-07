@@ -21,9 +21,9 @@ TokenListCursorNew PROC list : DWORD
 	.IF eax != 0
 		mov ecx, eax
 		mov eax, list
-		mov [ebx].TOKEN_LIST_CURSOR.list, eax
+		mov [ecx].TOKEN_LIST_CURSOR.list, eax
 		mov eax, [eax].TOKEN_LIST.head
-		mov [ebx].TOKEN_LISt_CURSOR.pos, eax
+		mov [ecx].TOKEN_LISt_CURSOR.pos, eax
 		mov eax, ecx
 	.ENDIF
 	ret
