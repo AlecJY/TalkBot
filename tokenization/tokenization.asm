@@ -19,12 +19,12 @@ TokenListDelete ENDP
 TokenListCursorNew PROC list : DWORD
 	INVOKE malloc, SIZEOF TOKEN_LIST_CURSOR
 	.IF eax != 0
-		mov ebx, eax
+		mov ecx, eax
 		mov eax, list
 		mov [ebx].TOKEN_LIST_CURSOR.list, eax
 		mov eax, [eax].TOKEN_LIST.head
 		mov [ebx].TOKEN_LISt_CURSOR.pos, eax
-		mov eax, ebx
+		mov eax, ecx
 	.ENDIF
 	ret
 TokenListCursorNew ENDP
