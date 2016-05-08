@@ -31,9 +31,11 @@ TokenListAppend PROC USES ebx list : DWORD, tok : DWORD
 		.IF eax == 0
 			jmp TokenListAppendError
 		.ENDIF
+		push eax
 		push ecx
 		INVOKE memset, eax, 0, SIZEOF TOKEN_LIST_BODY
 		pop ecx
+		pop eax
 		mov [ecx].TOKEN_LIST.head, eax
 		mov [ecx].TOKEN_LIST.tail, eax
 		lea eax, [eax].TOKEN_LIST_BODY.item
@@ -41,8 +43,11 @@ TokenListAppend PROC USES ebx list : DWORD, tok : DWORD
 		mov [eax], ecx
 	.ELSE
 		;; insert from tail
+	
 		mov ebx, [ecx].TOKEN_LIST.tail
+		push ecx
 		INVOKE malloc, SIZEOF TOKEN_LIST_BODY
+		pop ecx
 		.IF eax == 0
 			jmp TokenListAppendError
 		.ENDIF
