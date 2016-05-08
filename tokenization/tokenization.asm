@@ -21,6 +21,7 @@ TokenListDelete PROC list : DWORD
 		INVOKE free, eax
 		mov eax, ecx
 	.ENDW
+	ret
 TokenListDelete ENDP
 
 TokenListAppend PROC USES ebx list : DWORD, tok : DWORD
