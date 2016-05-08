@@ -25,7 +25,7 @@ TOKEN_LIST_CURSOR STRUCT
 TOKEN_LIST_CURSOR ENDS
 	
 .code
-; Tokenize accepts a string with space separated words, then 
+; Tokenize accepts a string with space separated words that is a null-terminated char array.
 ; list: a pointer to TOKEN_LIST that is returned by the TokenListNew() function
 ; input: a null terminated string
 ;	

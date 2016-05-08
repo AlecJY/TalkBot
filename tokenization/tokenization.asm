@@ -1,5 +1,7 @@
 INCLUDE tokenization.inc
-INCLUDE crt.inc	
+INCLUDE crt.inc
+.data
+spc BYTE ' ',0	
 .code
 TokenListNew PROC
 	INVOKE malloc, SIZEOF TOKEN_LIST
@@ -128,6 +130,48 @@ TokenListCursorNext PROC cursor : DWORD
 	mov ecx, [eax].TOKEN_LIST_CURSOR.pos
 	mov ecx, [ecx].TOKEN_LIST_BODY.next
 	mov [eax].TOKEN_LIST_CURSOR.pos, ecx
+	ret
 TokenListCursorNext ENDP
-	
+
+Tokenize PROC USES ebx edi list : DWORD, input : PTR BYTE
+	LOCAL savedPtr
+	mov ebx, input
+	.IF ebx == 0
+		ret
+	.ELSE
+		INVOKE strtok_r, ebx, ADDR spc, ADDR savedPtr
+		.IF eax == 0
+			;; There is only one token
+			INVOKE strlen, ebx
+			INVOKE TokenNew, ebx, eax
+			INVOKE TokenListAppend, list, eax
+			
+		.ELSE
+			push eax
+			INVOKE strlen, ebx
+			INVOKE TokenNew, ebx, eax
+			INVOKE TokenListAppend, list, eax
+			INVOKE strtok_r, 0, ADDR spc, ADDR savedPtr
+			.WHILE eax != 0
+				dec eax
+				mov BYTE PTR [eax], 0
+				mov edi, eax
+				pop ebx
+				INVOKE strlen, ebx
+				INVOKE TokenNew, ebx, eax
+				INVOKE TokenListAppend, list, eax
+				mov eax, edi
+				inc eax
+				push eax
+				INVOKE strtok_r, 0, ADDR spc, ADDR savedPtr
+			.ENDW
+			pop ebx
+			INVOKE strlen, ebx
+			INVOKE TokenNew, ebx, eax
+			INVOKE TokenListAppend, list, eax
+		.ENDIF
+		sub eax, input
+	.ENDIF
+	ret
+Tokenize ENDP	
 END
