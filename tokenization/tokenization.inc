@@ -15,7 +15,8 @@ TOKEN_LIST STRUCT
 TOKEN_LIST ENDS
 
 TOKEN STRUCT
-	;; TBD
+        tokWord DWORD ?
+	len DWORD ?
 TOKEN ENDS
 
 TOKEN_LIST_CURSOR STRUCT
@@ -36,8 +37,8 @@ TokenListNew PROTO
 TokenListDelete PROTO, list : DWORD
 ; TokenListAppend appends a TOKEN to the end of the TOKEN_LIST. If the operation succeeded, 0 is returned, otherwise, a non-zero value is returned
 TokenListAppend PROTO, list : DWORD, item : DWORD
-; TokenNew allocates and initializes a new TOKEN
-TokenNew PROTO
+; TokenNew allocates and initializes a new TOKEN, input is a null-terminated byte array, len is the length of the byte array, excluding the null terminator
+TokenNew PROTO, input : DWORD, len : DWORD
 ; TokenDelete deallocates a TOKEN
 TokenDelete PROTO, tok : DWORD
 ; TokenListCursorNew returns a TOKEN_LIST_CURSOR that points to the beginning of the list

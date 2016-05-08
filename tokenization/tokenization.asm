@@ -57,8 +57,22 @@ TokenListAppendError:
 	ret
 TokenListAppend ENDP	
 
-TokenNew PROC
+TokenNew PROC input : DWORD, len : DWORD
 	INVOKE malloc, SIZEOF TOKEN
+	.IF eax == 0
+		ret
+	.ENDIF
+	mov ecx, eax
+	INVOKE malloc, len
+	.IF eax == 0
+		INVOKE free, ecx
+		ret
+	.ENDIF
+	INVOKE memcpy, eax, input, len
+	mov [ecx].TOKEN.tokWord, eax
+	mov eax, len
+	mov [ecx].TOKEN.len, eax
+	mov eax, ecx
 	ret
 TokenNew ENDP
 
