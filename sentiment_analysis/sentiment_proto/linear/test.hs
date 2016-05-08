@@ -33,7 +33,9 @@ instance Monoid EmoStat where
 
 instance Monoid (Emotion EmoStat) where
     mempty = Emotion mempty mempty mempty mempty mempty
-    mappend (Emotion h1 a1 s1 f1 d1) (Emotion h2 a2 s2 f2 d2) = Emotion (h1 <> h2) (a1 <> a2) (s1 <> s2) (f1 <> f2) (d1 <> d2)                                        
+    mappend (Emotion h1 a1 s1 f1 d1) (Emotion h2 a2 s2 f2 d2) = Emotion (h1 <> h2) (a1 <> a2) (s1 <> s2) (f1 <> f2) (d1 <> d2)
+punc :: [Char]
+punc = ",./<>?';:\"[]{}\\-_=+`~!@#$%^&*()"
 toEmoStat :: Emotion EmoData -> Emotion EmoStat
 toEmoStat emo = (\x -> case x of
                          EmoData mean sd -> EmoStat 1 mean) <$> emo
@@ -75,5 +77,5 @@ main = do
   let emo = parse $ tail $ lines content
   input <- getLine
   putStr "average: "
-  putStrLn $ show $ emoAvg $ getEmo emo $ filter (all isAlpha) $ map (map toLower . filter (\x ->  (x /= '.') && (x /= ','))) $ words input
+  putStrLn $ show $ emoAvg $ getEmo emo $ filter (all isAlpha) $ map (map toLower . filter (\x ->  not $ any (== x) punc)) $ words input
   return ()
