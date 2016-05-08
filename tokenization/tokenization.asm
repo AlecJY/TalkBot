@@ -63,6 +63,7 @@ TokenNew ENDP
 
 TokenDelete PROC, tok : DWORD
 	INVOKE free, tok
+	ret
 TokenDelete ENDP
 	
 TokenListCursorNew PROC list : DWORD
