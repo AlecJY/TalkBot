@@ -14,6 +14,10 @@ TOKEN_LIST STRUCT
 	tail DWORD ?
 TOKEN_LIST ENDS
 
+TOKEN STRUCT
+	;; TBD
+TOKEN ENDS
+
 TOKEN_LIST_CURSOR STRUCT
 	list DWORD ?
 	pos DWORD ?
@@ -30,6 +34,12 @@ Tokenize PROTO, list : DWORD, input : PTR BYTE
 TokenListNew PROTO
 ; TokenListDelete deallocates a TOKEN_LIST, if list is a NULL pointer, no operation is performed
 TokenListDelete PROTO, list : DWORD
+; TokenListAppend appends a TOKEN to the end of the TOKEN_LIST. If the operation succeeded, 0 is returned, otherwise, a non-zero value is returned
+TokenListAppend PROTO, list : DWORD, item : DWORD
+; TokenNew allocates and initializes a new TOKEN
+TokenNew PROTO
+; TokenDelete deallocates a TOKEN
+TokenDelete PROTO, tok : DWORD
 ; TokenListCursorNew returns a TOKEN_LIST_CURSOR that points to the beginning of the list
 TokenListCursorNew PROTO, list : DWORD
 ; TokenListCursorDelete deallocates the cursor ptr, if cursor is a NULL pointer, no operation is performed

@@ -13,9 +13,58 @@ TokenListNew ENDP
 
 TokenListDelete PROC list : DWORD
 	mov eax, list
-	mov eax, [eax].TOKEN_LIST.head
+	.WHILE eax != 0
+		mov eax, [eax].TOKEN_LIST.head
+		mov ecx, [eax].TOKEN_LIST_BODY.item
+		INVOKE TokenDelete, ecx
+		mov ecx, [eax].TOKEN_LIST_BODY.next
+		INVOKE free, eax
+		mov eax, ecx
+	.ENDW
 TokenListDelete ENDP
 
+TokenListAppend PROC USES ebx list : DWORD, tok : DWORD
+	mov ecx, list
+	.IF [ecx].TOKEN_LIST.head == 0
+		INVOKE malloc, SIZEOF TOKEN_LIST_BODY
+		.IF eax == 0
+			jmp TokenListAppendError
+		.ENDIF
+		INVOKE memset, eax, 0, SIZEOF TOKEN_LIST_BODY
+		mov [ecx].TOKEN_LIST.head, eax
+		mov [ecx].TOKEN_LIST.tail, eax
+		lea eax, [eax].TOKEN_LIST_BODY.item
+		mov ecx, tok
+		mov [eax], ecx
+	.ELSE
+		;; insert from tail
+		mov ebx, [ecx].TOKEN_LIST.tail
+		INVOKE malloc, SIZEOF TOKEN_LIST_BODY
+		.IF eax == 0
+			jmp TokenListAppendError
+		.ENDIF
+		INVOKE memset, eax, 0, SIZEOF TOKEN_LIST_BODY
+		mov [eax].TOKEN_LIST_BODY.prev, ebx
+		mov [ebx].TOKEN_LIST_BODY.next, eax
+		mov [ecx].TOKEN_LISt.tail, eax
+	.ENDIF
+TokenListAppendExit:
+	mov eax, 0
+	ret
+TokenListAppendError:
+	mov eax, 1
+	ret
+TokenListAppend ENDP	
+
+TokenNew PROC
+	INVOKE malloc, SIZEOF TOKEN
+	ret
+TokenNew ENDP
+
+TokenDelete PROC, tok : DWORD
+	INVOKE free, tok
+TokenDelete ENDP
+	
 TokenListCursorNew PROC list : DWORD
 	INVOKE malloc, SIZEOF TOKEN_LIST_CURSOR
 	.IF eax != 0
@@ -41,11 +90,18 @@ TokenListCursorGetItem PROC cursor : DWORD
 TokenListCursorGetItem ENDP
 
 TokenListCursorPriv PROC cursor : DWORD
-	;; Not implemented
+	mov eax, cursor
+	mov ecx, [eax].TOKEN_LIST_CURSOR.pos
+	mov ecx, [ecx].TOKEN_LIST_BODY.prev
+	mov [eax].TOKEN_LIST_CURSOR.pos, ecx
+	ret
 TokenListCursorPriv ENDP
 
 TokenListCursorNext PROC cursor : DWORD
-	;; Not implemented
+	mov eax, cursor
+	mov ecx, [eax].TOKEN_LIST_CURSOR.pos
+	mov ecx, [ecx].TOKEN_LIST_BODY.next
+	mov [eax].TOKEN_LIST_CURSOR.pos, ecx
 TokenListCursorNext ENDP
 	
 END
