@@ -170,7 +170,6 @@ Tokenize PROC USES ebx edi list : DWORD, input : PTR BYTE
 			INVOKE TokenNew, ebx, eax
 			INVOKE TokenListAppend, list, eax
 		.ENDIF
-		sub eax, input
 	.ENDIF
 	ret
 Tokenize ENDP	
