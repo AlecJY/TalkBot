@@ -77,7 +77,10 @@ TokenNew PROC input : DWORD, len : DWORD
 TokenNew ENDP
 
 TokenDelete PROC, tok : DWORD
-	INVOKE free, tok
+	mov eax, tok
+	mov ecx, [eax].TOKEN.tokWord
+	INVOKE free, ecx
+	INVOKE free, eax
 	ret
 TokenDelete ENDP
 	
