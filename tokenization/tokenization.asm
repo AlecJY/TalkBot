@@ -139,7 +139,7 @@ Tokenize PROC USES ebx edi list : DWORD, input : PTR BYTE
 	.IF ebx == 0
 		ret
 	.ELSE
-		INVOKE strtok_r, ebx, ADDR spc, ADDR savedPtr
+		INVOKE strtok_s, ebx, ADDR spc, ADDR savedPtr
 		.IF eax == 0
 			;; There is only one token
 			INVOKE strlen, ebx
@@ -151,7 +151,7 @@ Tokenize PROC USES ebx edi list : DWORD, input : PTR BYTE
 			INVOKE strlen, ebx
 			INVOKE TokenNew, ebx, eax
 			INVOKE TokenListAppend, list, eax
-			INVOKE strtok_r, 0, ADDR spc, ADDR savedPtr
+			INVOKE strtok_s, 0, ADDR spc, ADDR savedPtr
 			.WHILE eax != 0
 				dec eax
 				mov BYTE PTR [eax], 0
@@ -163,7 +163,7 @@ Tokenize PROC USES ebx edi list : DWORD, input : PTR BYTE
 				mov eax, edi
 				inc eax
 				push eax
-				INVOKE strtok_r, 0, ADDR spc, ADDR savedPtr
+				INVOKE strtok_s, 0, ADDR spc, ADDR savedPtr
 			.ENDW
 			pop ebx
 			INVOKE strlen, ebx
