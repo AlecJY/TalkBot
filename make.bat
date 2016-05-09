@@ -12,8 +12,8 @@ SET COMPILEPATH=%~dp0
 SET OUTPUTPATH=%~dp0
 SET COMMONINCLUDE=/I%COMPILEPATH%common
 echo submodule tokenization
-cmd /C tokenization/make.bat
+cmd /C tokenization\make.bat
 echo submodule sentiment_analysis
-cmd /C sentiment_analysis/make.bat
+cmd /C sentiment_analysis\make.bat
 echo Running tests
-cmd /C test/make.bat
+cmd /C test\make.bat
