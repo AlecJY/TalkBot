@@ -1,0 +1,11 @@
+{
+    "extName": {
+        "message": "ASCII Chat for Twitch",
+        "description": "Extension Name"
+    },
+    
+    "extDescription": {
+        "message": "更改 Twitch 聊天室介面使其更適合顯示 ASCII 圖片",
+        "description": "Extension Desciption"
+    }
+}
