@@ -20,9 +20,11 @@ CfgConcat PROTO :DWORD, :DWORD
 
 
 .data
+; WinSock
 wsadata WSADATA <>
 sin sockaddr_in <>
 
+; ini Read
 iniPath DB ".\account.ini", 0
 AppName DB "account", 0
 NickKeyName DB "nick", 0
@@ -33,14 +35,16 @@ NickCmd DB "NICK ", 0
 PassCmd DB "PASS ", 0
 ChannelCmd DB "JOIN ", 0
 
+; Server logs
 loadCFG DB "Loading account.ini...", 13, 10, 0
 
+; Error Messages
 cfgReadError DB "Error: Cannot Read account.cfg", 13, 10, 0
 mallocFailed DB "Error: Memory Allocate failed", 13, 10, 0
 sockStartError DB "Initialize socket failed", 13, 10, 0
 sockError DB "Send Package failed", 13, 10, 0
-serverLog DB "ServerInfo: ", 0
 
+; IRC Server arguments
 IPAddr DB "52.24.191.57", 0
 Port DD 6667
 
@@ -54,6 +58,8 @@ hMemory DD ?
 buffer DD ?
 available_data DD ?
 actual_data_read DD ?
+
+; ini Read
 fileLen DD ?
 Pass DD ?
 PassSize DD ?
@@ -68,8 +74,10 @@ keyBuffer DD ?
 .code
 start:
 
-call ReadConfig
-invoke WSAStartup, 101h, addr wsadata
+call ReadConfig	; read config file
+
+; socket
+invoke WSAStartup, 101h, addr wsadata	; start winsock 1.1
 .if eax != NULL
     invoke StdOut, ADDR sockStartError
 .else
@@ -94,6 +102,8 @@ invoke WSAStartup, 101h, addr wsadata
 			invoke ExitProcess, -1
 		.endif
 	.endif
+	
+	; send pass, nick and channel info
 	invoke send, sock, Pass, PassSize, 0
 	.if eax == SOCKET_ERROR
 		invoke StdOut, ADDR sockError
@@ -107,6 +117,7 @@ invoke WSAStartup, 101h, addr wsadata
 		invoke StdOut, ADDR sockError
 	.endif
 	
+	; receive messages
 Receive:
 	invoke ioctlsocket, sock, FIONREAD, ADDR available_data
 	.if eax == NULL
@@ -128,6 +139,7 @@ Receive:
 invoke ExitProcess, 0
 
 ReadConfig PROC USES ebx ecx edx esi edi
+	;read config
 	invoke StdOut, ADDR loadCFG
 	invoke filesize, ADDR iniPath
 	.if eax < 0
@@ -148,11 +160,10 @@ ReadConfig PROC USES ebx ecx edx esi edi
 	mov ChannelSize, ecx
 	invoke CfgConcat, ADDR ChannelCmd, Channel
 	ret
-	
-	
 ReadConfig ENDP
 
 ReadINIString PROC USES ebx edx esi edi, fleng:DWORD, KeyName:DWORD
+	; read config from ini file
 	invoke GlobalAlloc, GHND, fleng
 	mov hMemory, eax
 	invoke GlobalLock, eax
@@ -167,6 +178,8 @@ ReadINIString PROC USES ebx edx esi edi, fleng:DWORD, KeyName:DWORD
 	mov ecx, keyLength
 	mov esi, buffer
 	mov edi, keyBuffer
+	
+	; add CRLF to the end of the string and five blank bytes at the initial of the string for command
 	add edi, 5
 	rep movsb
 	mov bl, 13
@@ -186,6 +199,7 @@ ReadINIString PROC USES ebx edx esi edi, fleng:DWORD, KeyName:DWORD
 ReadINIString ENDP
 
 CfgConcat PROC USES ebx ecx edx esi edi, fStr:DWORD, mStr:DWORD
+	; add command to string
 	mov esi, fStr
 	mov edi, mStr
 	mov ecx, 5
