@@ -17,6 +17,7 @@ SeperateMessage PROTO :DWORD, :DWORD
 GetLine PROTO :DWORD, :DWORD, :DWORD
 ReadINIString PROTO :DWORD, :DWORD
 CfgConcat PROTO :DWORD, :DWORD
+GetLineNumber PROTO :DWORD, :DWORD
 
 
 .data
@@ -47,6 +48,11 @@ sockError DB "Send Package failed", 13, 10, 0
 ; IRC Server arguments
 IPAddr DB "52.24.191.57", 0
 Port DD 6667
+
+; IRC Messages
+twitchAddr DB ":tmi.twitch.tv ", 0
+PING DB "PING ", 0
+PONG DB "PONG ", 0
 
 charStr DB 2 dup(?)
 
@@ -128,9 +134,30 @@ Receive:
 		invoke recv, sock, buffer, available_data, 0
 		mov actual_data_read, eax
 		.if eax > 0
+			invoke GetLineNumber, buffer, actual_data_read
+			mov ecx, eax
+			mov ebx, 0
+			
+		LineProcess:
+			
+			push ecx
+			invoke GetLine, buffer, actual_data_read, ebx
+			.if eax != -1
+				push ecx
+				invoke StdOut, eax
+				pop ecx
+				push ecx
+				invoke GlobalUnlock, ecx
+				pop ecx
+				invoke GlobalFree, ecx
+			.endif
+			inc ebx
+			pop ecx
+			loop LineProcess
+			
 			invoke SeperateMessage, buffer, actual_data_read
 		.endif
-		invoke GlobalUnlock, buffer
+		invoke GlobalUnlock, hMemory
 		invoke GlobalFree, hMemory
 	.endif
 	jmp Receive
@@ -207,28 +234,76 @@ CfgConcat PROC USES ebx ecx edx esi edi, fStr:DWORD, mStr:DWORD
 	ret
 CfgConcat ENDP
 
-GetLine PROC USES ebx ecx edx esi edi, message:DWORD, leng:DWORD, ln:DWORD
+GetLineNumber PROC USES ebx ecx edx esi edi, message:DWORD, leng:DWORD
+
+	mov ecx, leng
+	mov esi, message
+	mov eax, 1		; line counter
+	
+CharLoop:
+	mov bl, [esi]
+	.if bl == 13
+		inc eax
+	.endif
+	inc esi
+	loop CharLoop
+	ret
+GetLineNumber ENDP
+
+GetLine PROC USES ebx edx esi edi, message:DWORD, leng:DWORD, ln:DWORD
 	
 	mov ecx, leng
 	mov esi, message
-	mov ebx, 0		; line counter
-	mov edx, 1
+	mov eax, 0		; line counter
+	mov edx, 0		; line size counter
 	
 CharLoop:
-	mov dl, [esi]
-	.if dl == 13
-		inc ebx
-	.elseif ecx == 1
-		inc ebx
+	mov bl, [esi]
+	.if bl == 13
+		.if eax == ln
+			jmp LineToMemory
+		.else
+			inc eax
+			add esi, 2
+			sub ecx, 2
+			.if ecx == 0
+				jmp LineEnd
+			.endif
+			jmp CharLoop
+		.endif
+	.elseif eax == ln
+		inc edx
+		.if ecx == 1
+			jmp LineToMemory
+		.endif
 	.endif
-	mov edi, ln
-	.if ebx == ln
-		
-	.endif
-	inc edx
+	inc esi
 	loop CharLoop
+	
+LineEnd: 
+	mov eax, -1
 	ret
-
+	
+LineToMemory:
+	inc edx
+	push edx
+	invoke GlobalAlloc, GHND, edx
+	pop edx
+	push eax
+	push edx
+	invoke GlobalLock, eax
+	pop edx
+	push eax
+	dec edx
+	sub esi, edx
+	mov edi, eax
+	mov ecx, edx
+	rep movsb
+	mov bl, 0
+	mov [edi], bl
+	pop eax
+	pop ecx
+	ret
 	
 GetLine ENDP
 
