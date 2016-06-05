@@ -2,15 +2,15 @@
 SET TOOLKITPATH=%1
 SET ENTRY=main
 SET TESTENTRY=test_main
-SET INCLUDELIBS=Kernel32.lib user32.lib msvcrt.lib
-SET ASSEMBLER=%TOOLKITPATH%ML.exe
+SET INCLUDELIBS=Kernel32.lib user32.lib msvcrt1.lib
+SET ASSEMBLER=%TOOLKITPATH%\ML.exe
 SET ASSEMBLERPARAM=/c /coff /Zi /Fl
-SET LINKER=%TOOLKITPATH%LINK.exe
+SET LINKER=%TOOLKITPATH%\LINK.exe
 SET LINKERPARAM=/debug /subsystem:console /entry:%ENTRY% /out:%ENTRY%.exe /LIBPATH:%TOOLKITPATH% %INCLUDELIBS%
 SET TESTLINKERPARAM=/debug /subsystem:console /entry:%TESTENTRY% /out:%TESTENTRY%.exe /LIBPATH:%TOOLKITPATH% %INCLUDELIBS%
 SET COMPILEPATH=%~dp0
 SET OUTPUTPATH=%~dp0
-SET COMMONINCLUDE=/I%COMPILEPATH%common
+SET COMMONINCLUDE=/I%COMPILEPATH%\common
 echo submodule tokenization
 cmd /C tokenization\make.bat
 echo submodule sentiment_analysis
