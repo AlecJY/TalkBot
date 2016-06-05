@@ -18,9 +18,17 @@ GetLine PROTO :DWORD, :DWORD, :DWORD
 ReadINIString PROTO :DWORD, :DWORD
 CfgConcat PROTO :DWORD, :DWORD
 GetLineNumber PROTO :DWORD, :DWORD
-
+GetUsername PROTO :DWORD
+GetCommandResponse PROTO :DWORD
+PingPong PROTO :DWORD
 
 .data
+; basicData
+SendCRLF DB 13, 10, 0
+; testData
+newLine DB 13, 10, "=============================", 13, 10, 0
+
+
 ; WinSock
 wsadata WSADATA <>
 sin sockaddr_in <>
@@ -76,6 +84,8 @@ ChannelSize DD ?
 hMemoryKey DD ?
 keyLength DD ?
 keyBuffer DD ?
+username DD ?
+usernameHandle DD ?
 
 .code
 start:
@@ -137,25 +147,12 @@ Receive:
 			invoke GetLineNumber, buffer, actual_data_read
 			mov ecx, eax
 			mov ebx, 0
-			
+		
+			invoke SeperateMessage, buffer, actual_data_read
 		LineProcess:
-			
-			push ecx
-			invoke GetLine, buffer, actual_data_read, ebx
-			.if eax != -1
-				push ecx
-				invoke StdOut, eax
-				pop ecx
-				push ecx
-				invoke GlobalUnlock, ecx
-				pop ecx
-				invoke GlobalFree, ecx
-			.endif
-			inc ebx
-			pop ecx
+			call LineProcessProc
 			loop LineProcess
 			
-			invoke SeperateMessage, buffer, actual_data_read
 		.endif
 		invoke GlobalUnlock, hMemory
 		invoke GlobalFree, hMemory
@@ -164,6 +161,43 @@ Receive:
 	
 .endif
 invoke ExitProcess, 0
+
+LineProcessProc PROC
+	push ecx
+	invoke GetLine, buffer, actual_data_read, ebx
+	.if eax != -1
+		push ecx
+		push eax
+		invoke PingPong, eax
+		.if eax != 0
+			pop eax
+			push eax
+			invoke GetUsername, eax
+			invoke StdOut, username
+			invoke StdOut, ADDR newLine
+			pop eax
+			push eax
+			invoke StdOut, eax
+			invoke StdOut, ADDR newLine
+			pop eax
+			push eax
+			invoke GetCommandResponse, eax
+			pop eax
+			invoke StdOut, eax
+			invoke StdOut, ADDR newLine
+			push eax
+		.endif
+		pop eax
+		pop ecx
+		push ecx
+		invoke GlobalUnlock, ecx
+		pop ecx
+		invoke GlobalFree, ecx
+	.endif
+	inc ebx
+	pop ecx
+	ret
+LineProcessProc ENDP
 
 ReadConfig PROC USES ebx ecx edx esi edi
 	;read config
@@ -306,6 +340,134 @@ LineToMemory:
 	ret
 	
 GetLine ENDP
+
+GetUsername PROC USES ebx ecx edx esi edi, message:DWORD
+	
+	mov esi, message
+	inc esi
+	mov edx, 0 ; counter
+	
+CharLoop:
+	mov bl, [esi]
+	.if bl == 33
+		jmp LoopEnd
+	.elseif bl == 32
+		jmp LoopEnd
+	.endif
+	inc edx
+	inc esi
+	jmp CharLoop
+	
+LoopEnd:
+	inc edx
+	invoke GlobalAlloc, GHND, edx
+	mov usernameHandle, eax
+	invoke GlobalLock, eax
+	mov username, eax
+	mov esi, message
+	inc esi
+	mov edi, message
+	
+CharCopy:
+	mov bl, [esi]
+	.if bl == 33
+		mov ecx, 0
+		inc esi
+		jmp MSGDelete
+	.elseif bl == 32
+		mov ecx, 1
+		inc esi
+		jmp MSGDelete
+	.endif
+	mov [eax], bl
+	inc esi
+	inc eax
+	jmp CharCopy
+	
+MSGDelete:
+	mov bl, [esi]
+	mov [edi], bl
+	.if bl == 0
+		mov bl, 0
+		inc eax
+		mov [eax], bl
+		mov ecx, eax
+		ret
+	.endif
+	inc esi
+	inc edi
+	jmp MSGDelete
+	
+GetUsername ENDP
+
+GetCommandResponse PROC USES ebx ecx edx esi edi, message:DWORD
+
+	mov esi, message
+	mov eax, 0
+	mov ecx, 4
+	
+NumLoop:
+	mov bl, [esi]
+	.if bl >= 48
+		.if bl <= 57
+			sub bl, 48
+			imul eax, 10
+			movzx edx, bl
+			add eax, edx
+			inc esi
+			loop NumLoop
+		.endif
+	.elseif bl == 32
+		mov esi, message
+		add esi, 4
+		mov edi, message
+		jmp CharDel
+	.endif
+	mov eax, -1
+	ret
+	
+CharDel:
+	mov bl, [esi]
+	mov [edi], bl
+	.if bl != 0
+		inc esi
+		inc edi
+		jmp CharDel
+	.endif
+	ret
+
+GetCommandResponse ENDP
+
+PingPong PROC USES ebx ecx edx esi edi, message:DWORD
+	
+	mov esi, message
+	mov edi, OFFSET PING
+	mov ecx, 5
+	
+CheckPing:
+	mov bl, [esi]
+	mov bh, [edi]
+	.if bl != bh
+		mov eax, -1
+		ret
+	.endif
+	inc esi
+	inc edi
+	loop CheckPing
+	
+	mov ecx, 5
+	mov esi, OFFSET PONG
+	mov edi, message
+	rep movsb
+	invoke StdOut, message
+	invoke StdOut, ADDR SendCRLF
+	invoke szLen, message
+	invoke send, sock, message, eax, 0
+	invoke send, sock, ADDR SendCRLF, 2, 0
+	mov eax, 0
+	ret
+	
+PingPong ENDP
 
 SeperateMessage PROC USES ebx ecx edx esi edi, message:DWORD, leng:DWORD
 	mov esi, message
