@@ -26,7 +26,7 @@ TokenListDelete PROC list : DWORD
 	ret
 TokenListDelete ENDP
 
-TokenListAppend PROC USES ebx list : DWORD, tok : DWORD
+TokenListAppend PROC USES ebx, list : DWORD, tok : DWORD
 	mov ecx, list
 	.IF [ecx].TOKEN_LIST.head == 0
 		INVOKE malloc, SIZEOF TOKEN_LIST_BODY
@@ -56,7 +56,7 @@ TokenListAppend PROC USES ebx list : DWORD, tok : DWORD
 		INVOKE memset, eax, 0, SIZEOF TOKEN_LIST_BODY
 		mov [eax].TOKEN_LIST_BODY.prev, ebx
 		mov [ebx].TOKEN_LIST_BODY.next, eax
-		mov [ecx].TOKEN_LISt.tail, eax
+		mov [ecx].TOKEN_LIST.tail, eax
 	.ENDIF
 TokenListAppendExit:
 	mov eax, 0
@@ -71,17 +71,17 @@ TokenNew PROC input : DWORD, len : DWORD
 	.IF eax == 0
 		ret
 	.ENDIF
-	mov ecx, eax
+	mov ebx, eax
 	INVOKE malloc, len
 	.IF eax == 0
-		INVOKE free, ecx
+		INVOKE free, ebx
 		ret
 	.ENDIF
 	INVOKE memcpy, eax, input, len
-	mov [ecx].TOKEN.tokWord, eax
+	mov [ebx].TOKEN.tokWord, eax
 	mov eax, len
-	mov [ecx].TOKEN.len, eax
-	mov eax, ecx
+	mov [ebx].TOKEN.len, eax
+	mov eax, ebx
 	ret
 TokenNew ENDP
 
@@ -100,7 +100,7 @@ TokenListCursorNew PROC list : DWORD
 		mov eax, list
 		mov [ecx].TOKEN_LIST_CURSOR.list, eax
 		mov eax, [eax].TOKEN_LIST.head
-		mov [ecx].TOKEN_LISt_CURSOR.pos, eax
+		mov [ecx].TOKEN_LIST_CURSOR.pos, eax
 		mov eax, ecx
 	.ENDIF
 	ret
@@ -133,8 +133,7 @@ TokenListCursorNext PROC cursor : DWORD
 	ret
 TokenListCursorNext ENDP
 
-Tokenize PROC USES ebx edi list : DWORD, input : PTR BYTE
-	LOCAL savedPtr
+Tokenize PROC USES ebx edi, list : DWORD, input : PTR BYTE
 	mov ebx, input
 	.IF ebx == 0
 		ret
