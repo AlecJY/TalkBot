@@ -29,15 +29,15 @@ TokenListDelete ENDP
 TokenListAppend PROC USES ebx, list : DWORD, tok : DWORD
 	mov ecx, list
 	.IF [ecx].TOKEN_LIST.head == 0
+		push ecx
 		INVOKE malloc, SIZEOF TOKEN_LIST_BODY
 		.IF eax == 0
 			jmp TokenListAppendError
 		.ENDIF
 		push eax
-		push ecx
 		INVOKE memset, eax, 0, SIZEOF TOKEN_LIST_BODY
-		pop ecx
 		pop eax
+		pop ecx
 		mov [ecx].TOKEN_LIST.head, eax
 		mov [ecx].TOKEN_LIST.tail, eax
 		lea eax, [eax].TOKEN_LIST_BODY.item
@@ -49,11 +49,11 @@ TokenListAppend PROC USES ebx, list : DWORD, tok : DWORD
 		mov ebx, [ecx].TOKEN_LIST.tail
 		push ecx
 		INVOKE malloc, SIZEOF TOKEN_LIST_BODY
-		pop ecx
 		.IF eax == 0
 			jmp TokenListAppendError
 		.ENDIF
 		INVOKE memset, eax, 0, SIZEOF TOKEN_LIST_BODY
+		pop ecx
 		mov [eax].TOKEN_LIST_BODY.prev, ebx
 		mov [ebx].TOKEN_LIST_BODY.next, eax
 		mov [ecx].TOKEN_LIST.tail, eax
@@ -172,4 +172,25 @@ Tokenize PROC USES ebx edi, list : DWORD, input : PTR BYTE
 	.ENDIF
 	ret
 Tokenize ENDP	
+
+PrintToken PROC USES ebx, input : DWORD
+	mov eax, input
+	.IF eax == 0
+		ret
+	.ELSE
+		mov ebx, [eax].TOKEN.tokWord
+		mov ecx, [eax].TOKEN.len
+		.WHILE ecx > 0
+			push ecx
+			push eax
+			mov al, BYTE PTR [eax]
+			INVOKE putchar, al
+			pop eax
+			inc eax
+			pop ecx
+			dec ecx
+		.ENDW
+	.ENDIF
+PrintToken ENDP
+
 END

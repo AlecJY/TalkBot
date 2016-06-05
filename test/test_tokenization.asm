@@ -3,7 +3,7 @@ INCLUDE crt.inc
 .data
 test_token_str BYTE "This is a test",0
 TokenListNewFailedMsg BYTE "TokenListNew failed", 0
-TestMainMsg BYTE "%d ", 0	
+CRLF BYTE "\r\n", 0	
 .code
 
 test_main PROC
@@ -21,7 +21,8 @@ test_main PROC
 	INVOKE TokenListCursorGetItem, edi
 	mov ebx, eax
 	.WHILE ebx != 0
-		INVOKE printf, ADDR TestMainMsg, ebx
+		INVOKE PrintToken, ebx
+		INVOKE printf, ADDR CRLF
 		INVOKE TokenListCursorNext, edi
 		INVOKE TokenListCursorGetItem, edi
 		mov ebx, eax

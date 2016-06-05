@@ -47,7 +47,9 @@ TokenListCursorNew PROTO, list : DWORD
 TokenListCursorDelete PROTO, cursor : DWORD
 ; TokenListCursorGetItem : return the token ptr that the cursor is pointing to
 TokenListCursorGetItem PROTO, cursor : DWORD
-; TokenListCursorPriv : No return value. Destructively modify the pointer to TOKEN_LIST_CURSOR to the previous item. If the previous item does not exist, then the content to which cursor points to does not change at all.
+; TokenListCursorPriv : No return value. Destructively modify the pointer to TOKEN_LIST_CURSOR to the previous item. If the previous item does not exist, then the content points to a NULL ptr.
 TokenListCursorPriv PROTO, cursor : DWORD
-; TokenListCursorNext :  No return value. Destructively modify the pointer to TOKEN_LIST_CURSOR to the next item. If the next item does not exist, then the content to which cursor points to does not change at all.
+; TokenListCursorNext :  No return value. Destructively modify the pointer to TOKEN_LIST_CURSOR to the next item. If the next item does not exist, then the content points to a NULL ptr.
 TokenListCursorNext PROTO, cursor : DWORD
+; PrintToken : print out the token given
+PrintToken PROTO, input : DWORD

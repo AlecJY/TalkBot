@@ -10,3 +10,4 @@ strtok PROTO C p : DWORD, delim : DWORD
 strlen PROTO C p : DWORD
 printf PROTO C p : PTR BYTE, : VARARG
 exit PROTO C num : DWORD
+putchar PROTO C char : BYTE
