@@ -41,12 +41,11 @@ TokenListAppend PROC USES ebx, list : DWORD, tok : DWORD
 		mov [ecx].TOKEN_LIST.head, eax
 		mov [ecx].TOKEN_LIST.tail, eax
 		lea eax, [eax].TOKEN_LIST_BODY.item
-		mov ecx, tok
-		mov [eax], ecx
+		mov edx, tok
+		mov [eax], edx
 	.ELSE
 		;; insert from tail
 	
-		mov ebx, [ecx].TOKEN_LIST.tail
 		push ecx
 		INVOKE malloc, SIZEOF TOKEN_LIST_BODY
 		.IF eax == 0
@@ -54,7 +53,10 @@ TokenListAppend PROC USES ebx, list : DWORD, tok : DWORD
 		.ENDIF
 		INVOKE memset, eax, 0, SIZEOF TOKEN_LIST_BODY
 		pop ecx
+		mov ebx, [ecx].TOKEN_LIST.tail
 		mov [eax].TOKEN_LIST_BODY.prev, ebx
+		mov edx, tok
+		mov [eax].TOKEN_LIST_BODY.item, edx
 		mov [ebx].TOKEN_LIST_BODY.next, eax
 		mov [ecx].TOKEN_LIST.tail, eax
 	.ENDIF
@@ -114,6 +116,9 @@ TokenListCursorDelete ENDP
 TokenListCursorGetItem PROC cursor : DWORD
 	mov eax, cursor
 	mov eax, [eax].TOKEN_LIST_CURSOR.pos
+	.IF eax != 0
+		mov eax, [eax].TOKEN_LIST_BODY.item
+	.ENDIF
 	ret
 TokenListCursorGetItem ENDP
 
@@ -139,36 +144,14 @@ Tokenize PROC USES ebx edi, list : DWORD, input : PTR BYTE
 		ret
 	.ELSE
 		INVOKE strtok, ebx, ADDR spc
-		.IF eax == 0
-			;; There is only one token
-			INVOKE strlen, ebx
-			INVOKE TokenNew, ebx, eax
-			INVOKE TokenListAppend, list, eax
-			
-		.ELSE
+		.WHILE eax != 0
 			push eax
-			INVOKE strlen, ebx
+			INVOKE strlen, eax
+			pop ebx
 			INVOKE TokenNew, ebx, eax
 			INVOKE TokenListAppend, list, eax
 			INVOKE strtok, 0, ADDR spc
-			.WHILE eax != 0
-				dec eax
-				mov BYTE PTR [eax], 0
-				mov edi, eax
-				pop ebx
-				INVOKE strlen, ebx
-				INVOKE TokenNew, ebx, eax
-				INVOKE TokenListAppend, list, eax
-				mov eax, edi
-				inc eax
-				push eax
-				INVOKE strtok, 0, ADDR spc
-			.ENDW
-			pop ebx
-			INVOKE strlen, ebx
-			INVOKE TokenNew, ebx, eax
-			INVOKE TokenListAppend, list, eax
-		.ENDIF
+		.ENDW
 	.ENDIF
 	ret
 Tokenize ENDP	
@@ -182,15 +165,16 @@ PrintToken PROC USES ebx, input : DWORD
 		mov ecx, [eax].TOKEN.len
 		.WHILE ecx > 0
 			push ecx
-			push eax
-			mov al, BYTE PTR [eax]
+			push ebx
+			mov al, [ebx]
 			INVOKE putchar, al
-			pop eax
-			inc eax
+			pop ebx
 			pop ecx
+			inc ebx
 			dec ecx
 		.ENDW
 	.ENDIF
+	ret
 PrintToken ENDP
 
 END
