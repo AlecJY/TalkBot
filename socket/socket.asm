@@ -16,15 +16,20 @@ includelib \masm32\lib\miglib.lib
 SeperateMessage PROTO :DWORD, :DWORD
 GetLine PROTO :DWORD, :DWORD, :DWORD
 ReadINIString PROTO :DWORD, :DWORD
+ReadChannelString PROTO :DWORD, :DWORD
 CfgConcat PROTO :DWORD, :DWORD
 GetLineNumber PROTO :DWORD, :DWORD
 GetUsername PROTO :DWORD
 GetCommandResponse PROTO :DWORD
+GetMsg PROTO :DWORD
+EchoMsg PROTO :DWORD
 PingPong PROTO :DWORD
 
 .data
 ; basicData
 SendCRLF DB 13, 10, 0
+SendSpace DB " ", 0
+
 ; testData
 newLine DB 13, 10, "=============================", 13, 10, 0
 
@@ -43,6 +48,8 @@ DefaultVal DB "NULL", 0
 NickCmd DB "NICK ", 0
 PassCmd DB "PASS ", 0
 ChannelCmd DB "JOIN ", 0
+PrivMsgCmd DB "PRIVMSG ", 0
+
 
 ; Server logs
 loadCFG DB "Loading account.ini...", 13, 10, 0
@@ -61,6 +68,7 @@ Port DD 6667
 twitchAddr DB ":tmi.twitch.tv ", 0
 PING DB "PING ", 0
 PONG DB "PONG ", 0
+Seperator DB " :@", 0
 
 charStr DB 2 dup(?)
 
@@ -81,6 +89,8 @@ Nick DD ?
 NickSize DD ?
 Channel DD ?
 ChannelSize DD ?
+ChannelName DD ?
+ChannelNameSize DD ?
 hMemoryKey DD ?
 keyLength DD ?
 keyBuffer DD ?
@@ -183,9 +193,34 @@ LineProcessProc PROC
 			push eax
 			invoke GetCommandResponse, eax
 			pop eax
+			push eax
 			invoke StdOut, eax
 			invoke StdOut, ADDR newLine
+			pop eax
 			push eax
+			invoke InString, 1, eax, ADDR PrivMsgCmd
+			.if eax > 0
+				pop eax
+				invoke GetMsg, eax
+				invoke EchoMsg, eax
+				push eax
+				invoke send, sock, ADDR PrivMsgCmd, 8, 0
+				invoke send, sock, ChannelName, ChannelNameSize, 0
+				invoke send, sock, ADDR Seperator, 3, 0
+				invoke szLen, username
+				invoke send, sock, username, eax, 0
+				invoke send, sock, ADDR SendSpace, 1, 0
+				pop eax
+				push eax
+				invoke szLen, eax
+				mov ebx, eax
+				pop eax
+				invoke send, sock, eax, ebx, 0
+				invoke send, sock, ADDR SendCRLF, 2, 0
+				push eax
+			.endif
+			invoke GlobalUnlock, usernameHandle
+			invoke GlobalFree, usernameHandle
 		.endif
 		pop eax
 		pop ecx
@@ -220,6 +255,9 @@ ReadConfig PROC USES ebx ecx edx esi edi
 	mov Channel, eax
 	mov ChannelSize, ecx
 	invoke CfgConcat, ADDR ChannelCmd, Channel
+	invoke ReadChannelString, fileLen, ADDR ChannelKeyName
+	mov ChannelName, eax
+	mov ChannelNameSize, ecx
 	ret
 ReadConfig ENDP
 
@@ -258,6 +296,34 @@ ReadINIString PROC USES ebx edx esi edi, fleng:DWORD, KeyName:DWORD
 	add ecx, 7
 	ret
 ReadINIString ENDP
+
+ReadChannelString PROC USES ebx edx esi edi, fleng:DWORD, KeyName:DWORD
+	; read config from ini file
+	invoke GlobalAlloc, GHND, fleng
+	mov hMemory, eax
+	invoke GlobalLock, eax
+	mov buffer, eax
+	invoke GetPrivateProfileString, ADDR AppName, KeyName, ADDR DefaultVal, buffer, fleng, ADDR iniPath
+	mov keyLength, eax
+	add eax, 1
+	invoke GlobalAlloc, GHND, eax
+	mov hMemoryKey, eax
+	invoke GlobalLock, eax
+	mov keyBuffer, eax
+	mov ecx, keyLength
+	mov esi, buffer
+	mov edi, keyBuffer
+	
+	; add CRLF to the end of the string and five blank bytes at the initial of the string for command
+	rep movsb
+	mov bl, 0
+	mov [edi], bl
+	invoke GlobalUnlock, buffer
+	invoke GlobalFree, hMemory
+	mov eax, keyBuffer
+	mov ecx, keyLength
+	ret
+ReadChannelString ENDP
 
 CfgConcat PROC USES ebx ecx edx esi edi, fStr:DWORD, mStr:DWORD
 	; add command to string
@@ -438,6 +504,36 @@ CharDel:
 
 GetCommandResponse ENDP
 
+GetMsg PROC USES ebx ecx edx edi edi, message:DWORD
+	
+	mov esi, message
+	mov eax, -1
+
+CharLoop:
+	mov bl, [esi]
+	.if bl == 58
+		mov edi, message
+		inc esi
+		jmp CharDel
+	.elseif bl == 0
+		ret
+	.endif
+	inc esi
+	jmp CharLoop
+	
+CharDel:
+	mov bl, [esi]
+	mov [edi], bl
+	.if bl == 0
+		mov eax, message
+		ret
+	.endif
+	inc esi
+	inc edi
+	jmp CharDel
+	
+GetMsg ENDP
+
 PingPong PROC USES ebx ecx edx esi edi, message:DWORD
 	
 	mov esi, message
@@ -468,6 +564,13 @@ CheckPing:
 	ret
 	
 PingPong ENDP
+
+EchoMsg PROC USES ebx ecx edx esi edi, message:DWORD
+	
+	mov eax, message
+	ret
+	
+EchoMsg ENDP
 
 SeperateMessage PROC USES ebx ecx edx esi edi, message:DWORD, leng:DWORD
 	mov esi, message
