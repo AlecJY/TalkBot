@@ -27,12 +27,12 @@ PingPong PROTO :DWORD
 
 .data
 ; basicData
+CopyRight DB "TalkBot Nightly 2016-06-08", 13, 10, "https://github.com/petercommand/TalkBot",13, 10, "(C) 2016 TalkBot Team", 13, 10, 13, 10, 0
 SendCRLF DB 13, 10, 0
 SendSpace DB " ", 0
 
 ; testData
-newLine DB 13, 10, "=============================", 13, 10, 0
-
+newLine DB "==========================================", 13, 10, 0
 
 ; WinSock
 wsadata WSADATA <>
@@ -71,6 +71,7 @@ PONG DB "PONG ", 0
 Seperator DB " :@", 0
 
 charStr DB 2 dup(?)
+dwString DD 100 dup(?)
 
 .data?
 fileBuffer DD ?
@@ -94,12 +95,17 @@ ChannelNameSize DD ?
 hMemoryKey DD ?
 keyLength DD ?
 keyBuffer DD ?
+
 username DD ?
 usernameHandle DD ?
+RetrivedMsg DD ?
+RetrivedMsgHandle DD ?
+RetrivedMsgSize DD ?
 
 .code
 start:
 
+invoke StdOut, ADDR CopyRight
 call ReadConfig	; read config file
 
 ; socket
@@ -154,11 +160,10 @@ Receive:
 		invoke recv, sock, buffer, available_data, 0
 		mov actual_data_read, eax
 		.if eax > 0
+			invoke SeperateMessage, buffer, actual_data_read
 			invoke GetLineNumber, buffer, actual_data_read
 			mov ecx, eax
 			mov ebx, 0
-		
-			invoke SeperateMessage, buffer, actual_data_read
 		LineProcess:
 			call LineProcessProc
 			loop LineProcess
@@ -183,19 +188,9 @@ LineProcessProc PROC
 			pop eax
 			push eax
 			invoke GetUsername, eax
-			invoke StdOut, username
-			invoke StdOut, ADDR newLine
-			pop eax
-			push eax
-			invoke StdOut, eax
-			invoke StdOut, ADDR newLine
 			pop eax
 			push eax
 			invoke GetCommandResponse, eax
-			pop eax
-			push eax
-			invoke StdOut, eax
-			invoke StdOut, ADDR newLine
 			pop eax
 			push eax
 			invoke InString, 1, eax, ADDR PrivMsgCmd
@@ -203,24 +198,23 @@ LineProcessProc PROC
 				pop eax
 				invoke GetMsg, eax
 				invoke EchoMsg, eax
+				mov RetrivedMsg, eax
 				push eax
-				invoke send, sock, ADDR PrivMsgCmd, 8, 0
-				invoke send, sock, ChannelName, ChannelNameSize, 0
-				invoke send, sock, ADDR Seperator, 3, 0
-				invoke szLen, username
-				invoke send, sock, username, eax, 0
-				invoke send, sock, ADDR SendSpace, 1, 0
-				pop eax
-				push eax
-				invoke szLen, eax
-				mov ebx, eax
-				pop eax
-				invoke send, sock, eax, ebx, 0
-				invoke send, sock, ADDR SendCRLF, 2, 0
-				push eax
+				invoke szLen, RetrivedMsg
+				mov RetrivedMsgSize, eax
+				invoke GetLineNumber, RetrivedMsg, RetrivedMsgSize
+				mov ecx, eax
+				mov edx, 0
+				
+			LineMsgLoop:
+				push ecx
+				call SendMsg
+				pop ecx
+				loop LineMsgLoop
 			.endif
 			invoke GlobalUnlock, usernameHandle
 			invoke GlobalFree, usernameHandle
+			
 		.endif
 		pop eax
 		pop ecx
@@ -233,6 +227,43 @@ LineProcessProc PROC
 	pop ecx
 	ret
 LineProcessProc ENDP
+
+SendMsg PROC
+
+	push edx
+	invoke GetLine, RetrivedMsg, RetrivedMsgSize, edx
+	push ecx
+	push eax
+	invoke send, sock, ADDR PrivMsgCmd, 8, 0
+	invoke StdOut, ADDR PrivMsgCmd
+	invoke send, sock, ChannelName, ChannelNameSize, 0
+	invoke StdOut, ChannelName
+	invoke send, sock, ADDR Seperator, 3, 0
+	invoke StdOut, ADDR Seperator
+	invoke szLen, username
+	invoke send, sock, username, eax, 0
+	invoke StdOut, username
+	invoke send, sock, ADDR SendSpace, 1, 0
+	invoke StdOut, ADDR SendSpace
+	pop eax
+	push eax
+	invoke szLen, eax
+	mov ebx, eax
+	pop eax
+	push eax
+	invoke send, sock, eax, ebx, 0
+	pop eax
+	invoke StdOut, eax
+	invoke send, sock, ADDR SendCRLF, 2, 0
+	invoke StdOut, ADDR SendCRLF
+	pop ecx
+	invoke GlobalUnlock, ecx
+	invoke GlobalFree, ecx
+	pop edx
+	inc edx
+	ret
+
+SendMsg ENDP
 
 ReadConfig PROC USES ebx ecx edx esi edi
 	;read config
@@ -395,7 +426,7 @@ LineToMemory:
 	pop edx
 	push eax
 	dec edx
-	sub esi, edx
+	mov esi, message
 	mov edi, eax
 	mov ecx, edx
 	rep movsb
@@ -411,7 +442,7 @@ GetUsername PROC USES ebx ecx edx esi edi, message:DWORD
 	
 	mov esi, message
 	inc esi
-	mov edx, 0 ; counter
+	mov edx, 1 ; counter
 	
 CharLoop:
 	mov bl, [esi]
@@ -426,6 +457,7 @@ CharLoop:
 	
 LoopEnd:
 	inc edx
+	mov eax, eax
 	invoke GlobalAlloc, GHND, edx
 	mov usernameHandle, eax
 	invoke GlobalLock, eax
