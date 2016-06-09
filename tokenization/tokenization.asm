@@ -69,7 +69,7 @@ TokenListAppendError:
 TokenListAppend ENDP	
 
 TokenNew PROC input : DWORD, len : DWORD
-	INVOKE malloc, SIZEOF TOKEN
+	INVOKE calloc, 1, SIZEOF TOKEN + 1
 	.IF eax == 0
 		ret
 	.ENDIF

@@ -3,7 +3,7 @@ INCLUDE crt.inc
 .data
 test_token_str BYTE "This is a test",0
 TokenListNewFailedMsg BYTE "TokenListNew failed", 0
-CRLF BYTE "\r\n", 0	
+CRLF BYTE 0dh, 0ah, 0	
 .code
 
 test_main PROC

@@ -1,5 +1,5 @@
 {-# LANGUAGE DeriveGeneric, DeriveAnyClass, StandaloneDeriving, FlexibleInstances, DeriveFunctor #-}
-import qualified Data.Map as M
+import qualified Data.Map.Strict as M
 import System.Environment
 import System.IO
 import Control.DeepSeq

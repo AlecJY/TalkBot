@@ -15,5 +15,7 @@ echo submodule tokenization
 cmd /C tokenization\make.bat
 echo submodule sentiment_analysis
 cmd /C sentiment_analysis\make.bat
+echo submoudle get_score
+cmd /C get_score\make.bat
 echo Running tests
 cmd /C test\make.bat
