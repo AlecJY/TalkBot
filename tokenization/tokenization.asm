@@ -68,13 +68,13 @@ TokenListAppendError:
 	ret
 TokenListAppend ENDP	
 
-TokenNew PROC input : DWORD, len : DWORD
-	INVOKE calloc, 1, SIZEOF TOKEN + 1
+TokenNew PROC USES ebx, input : DWORD, len : DWORD
+	INVOKE malloc, SIZEOF TOKEN
 	.IF eax == 0
 		ret
 	.ENDIF
 	mov ebx, eax
-	INVOKE malloc, len
+	INVOKE calloc, 1, len + 1
 	.IF eax == 0
 		INVOKE free, ebx
 		ret
