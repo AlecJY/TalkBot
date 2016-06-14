@@ -46,7 +46,7 @@ GuassMFunc PROC,
 GuassMFunc ENDP
 
 .data
-medianArray REAL4  0,3,5
+medianArray REAL4  0.0, 3.0, 5.0
 LOW_MOOD = 0
 MID_MOOD = 1
 HIGH_MOOD = 2
