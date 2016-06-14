@@ -1,3 +1,6 @@
+INCLUDE fuzzySystem.inc 
+
+
 exp PROC,
     x:REAL4
     
@@ -10,10 +13,10 @@ exp PROC,
     fadd
 
     mov ecx, 8
-L1:
+L9:
     fst st(1)
     fmul
-    loop L1
+    loop L9
     
     fst dword ptr[esp]
     pop eax
@@ -50,7 +53,7 @@ HIGH = 2
 
 .code
 FuzzySystem PROC USES ebx ecx edi esi,
-    emotions:DWORD,
+    emotions:DWORD
     LOCAL strArray[15]:REAL4, sum:REAL4, tstr:REAL4, ans:DWORD
 
     xor esi, esi
