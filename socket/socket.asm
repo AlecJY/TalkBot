@@ -1,5 +1,3 @@
-.386
-.model flat, stdcall
 option casemap:none
 
 include ..\project\project.inc
@@ -14,6 +12,8 @@ includelib \masm32\lib\kernel32.lib
 includelib \masm32\lib\masm32.lib
 includelib \masm32\lib\wsock32.lib
 includelib \masm32\lib\miglib.lib
+
+SetCurrentConsoleFontEx PROTO STDCALL :DWORD, :DWORD, :DWORD
 
 SeperateMessage PROTO :DWORD, :DWORD
 GetLine PROTO :DWORD, :DWORD, :DWORD
@@ -39,6 +39,7 @@ newLine DB "==========================================", 13, 10, 0
 ; WinSock
 wsadata WSADATA <>
 sin sockaddr_in <>
+recvNone DD 0
 
 ; ini Read
 iniPath DB ".\account.ini", 0
@@ -61,6 +62,7 @@ cfgReadError DB "Error: Cannot Read account.cfg", 13, 10, 0
 mallocFailed DB "Error: Memory Allocate failed", 13, 10, 0
 sockStartError DB "Initialize socket failed", 13, 10, 0
 sockError DB "Send Package failed", 13, 10, 0
+sockClosed DB "Connection reset by host", 13, 10, 0
 
 ; IRC Server arguments
 IPAddr DB "52.24.191.57", 0
@@ -107,6 +109,7 @@ RetrivedMsgSize DD ?
 .code
 start:
 
+invoke SetConsoleOutputCP, 65001 ; set output code page to UTF-8
 invoke StdOut, ADDR CopyRight
 call ReadConfig	; read config file
 
@@ -162,6 +165,7 @@ Receive:
 		invoke recv, sock, buffer, available_data, 0
 		mov actual_data_read, eax
 		.if eax > 0
+			mov recvNone, 0
 			invoke SeperateMessage, buffer, actual_data_read
 			invoke GetLineNumber, buffer, actual_data_read
 			mov ecx, eax
@@ -169,7 +173,15 @@ Receive:
 		LineProcess:
 			call LineProcessProc
 			loop LineProcess
-			
+		.elseif eax == 0
+			inc recvNone
+		.elseif eax == SOCKET_ERROR
+			invoke StdOut, ADDR sockClosed
+			invoke ExitProcess, -1
+		.endif
+		.if recvNone > 100 ; check if connection alive
+			invoke StdOut, ADDR sockClosed
+			invoke ExitProcess, 0
 		.endif
 		invoke GlobalUnlock, hMemory
 		invoke GlobalFree, hMemory
