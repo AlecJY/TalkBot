@@ -107,89 +107,91 @@ RetrivedMsgHandle DD ?
 RetrivedMsgSize DD ?
 
 .code
-start:
+main PROC
+	start:
 
-invoke SetConsoleOutputCP, 65001 ; set output code page to UTF-8
-invoke StdOut, ADDR CopyRight
-call ReadConfig	; read config file
+	invoke SetConsoleOutputCP, 65001 ; set output code page to UTF-8
+	invoke StdOut, ADDR CopyRight
+	call ReadConfig	; read config file
 
-; socket
-invoke WSAStartup, 101h, addr wsadata	; start winsock 1.1
-.if eax != NULL
-    invoke StdOut, ADDR sockStartError
-.else
-    invoke socket, AF_INET, SOCK_STREAM, 0
-    .if eax != INVALID_SOCKET
-        mov sock, eax
-    .else
-        invoke WSAGetLastError
-        invoke StdOut, ADDR sockStartError
-        invoke ExitProcess, -1
-    .endif
-    mov sin.sin_family, AF_INET
-	invoke htons, Port
-	mov sin.sin_port, ax
-	invoke inet_addr, ADDR IPAddr
-	mov sin.sin_addr, eax
-	invoke connect, sock, ADDR sin, SIZEOF sin
-	.if eax == SOCKET_ERROR
-		invoke WSAGetLastError
-		.if eax != WSAEWOULDBLOCK
+	; socket
+	invoke WSAStartup, 101h, addr wsadata	; start winsock 1.1
+	.if eax != NULL
+		invoke StdOut, ADDR sockStartError
+	.else
+		invoke socket, AF_INET, SOCK_STREAM, 0
+		.if eax != INVALID_SOCKET
+			mov sock, eax
+		.else
+			invoke WSAGetLastError
 			invoke StdOut, ADDR sockStartError
 			invoke ExitProcess, -1
 		.endif
-	.endif
-	
-	; send pass, nick and channel info
-	invoke send, sock, Pass, PassSize, 0
-	.if eax == SOCKET_ERROR
-		invoke StdOut, ADDR sockError
-	.endif
-	invoke send, sock, Nick, NickSize, 0
-	.if eax == SOCKET_ERROR
-		invoke StdOut, ADDR sockError
-	.endif
-	invoke send, sock, Channel, ChannelSize, 0
-	.if eax == SOCKET_ERROR
-		invoke StdOut, ADDR sockError
-	.endif
-	
-	; receive messages
-Receive:
-	invoke ioctlsocket, sock, FIONREAD, ADDR available_data
-	.if eax == NULL
-		invoke GlobalAlloc, GHND, available_data
-		mov hMemory, eax
-		invoke GlobalLock, eax
-		mov buffer, eax
-		invoke recv, sock, buffer, available_data, 0
-		mov actual_data_read, eax
-		.if eax > 0
-			mov recvNone, 0
-			invoke SeperateMessage, buffer, actual_data_read
-			invoke GetLineNumber, buffer, actual_data_read
-			mov ecx, eax
-			mov ebx, 0
-		LineProcess:
-			call LineProcessProc
-			loop LineProcess
-		.elseif eax == 0
-			inc recvNone
-		.elseif eax == SOCKET_ERROR
-			invoke StdOut, ADDR sockClosed
-			invoke ExitProcess, -1
+		mov sin.sin_family, AF_INET
+		invoke htons, Port
+		mov sin.sin_port, ax
+		invoke inet_addr, ADDR IPAddr
+		mov sin.sin_addr, eax
+		invoke connect, sock, ADDR sin, SIZEOF sin
+		.if eax == SOCKET_ERROR
+			invoke WSAGetLastError
+			.if eax != WSAEWOULDBLOCK
+				invoke StdOut, ADDR sockStartError
+				invoke ExitProcess, -1
+			.endif
 		.endif
-		.if recvNone > 100 ; check if connection alive
-			invoke StdOut, ADDR sockClosed
-			invoke ExitProcess, 0
+		
+		; send pass, nick and channel info
+		invoke send, sock, Pass, PassSize, 0
+		.if eax == SOCKET_ERROR
+			invoke StdOut, ADDR sockError
 		.endif
-		invoke GlobalUnlock, hMemory
-		invoke GlobalFree, hMemory
+		invoke send, sock, Nick, NickSize, 0
+		.if eax == SOCKET_ERROR
+			invoke StdOut, ADDR sockError
+		.endif
+		invoke send, sock, Channel, ChannelSize, 0
+		.if eax == SOCKET_ERROR
+			invoke StdOut, ADDR sockError
+		.endif
+		
+		; receive messages
+	Receive:
+		invoke ioctlsocket, sock, FIONREAD, ADDR available_data
+		.if eax == NULL
+			invoke GlobalAlloc, GHND, available_data
+			mov hMemory, eax
+			invoke GlobalLock, eax
+			mov buffer, eax
+			invoke recv, sock, buffer, available_data, 0
+			mov actual_data_read, eax
+			.if eax > 0
+				mov recvNone, 0
+				invoke SeperateMessage, buffer, actual_data_read
+				invoke GetLineNumber, buffer, actual_data_read
+				mov ecx, eax
+				mov ebx, 0
+			LineProcess:
+				call LineProcessProc
+				loop LineProcess
+			.elseif eax == 0
+				inc recvNone
+			.elseif eax == SOCKET_ERROR
+				invoke StdOut, ADDR sockClosed
+				invoke ExitProcess, -1
+			.endif
+			.if recvNone > 100 ; check if connection alive
+				invoke StdOut, ADDR sockClosed
+				invoke ExitProcess, 0
+			.endif
+			invoke GlobalUnlock, hMemory
+			invoke GlobalFree, hMemory
+		.endif
+		jmp Receive
+		
 	.endif
-	jmp Receive
-	
-.endif
-invoke ExitProcess, 0
+	invoke ExitProcess, 0
+main ENDP
 
 LineProcessProc PROC
 	push ecx
@@ -635,4 +637,4 @@ LMsg:
 	loop LMsg
 	ret
 SeperateMessage ENDP
-END start
+END main
