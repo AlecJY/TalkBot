@@ -1,17 +1,17 @@
 option casemap:none
 
-include ..\project\project.inc
+include asciiart.inc
 
-include \masm32\include\kernel32.inc
-include \masm32\include\windows.inc
-include \masm32\include\masm32.inc
-include \masm32\include\wsock32.inc
+include kernel32.inc
+include windows.inc
+include masm32.inc
+include wsock32.inc
 include miglib.inc
 
-includelib \masm32\lib\kernel32.lib
-includelib \masm32\lib\masm32.lib
-includelib \masm32\lib\wsock32.lib
-includelib \masm32\lib\miglib.lib
+includelib kernel32.lib
+includelib masm32.lib
+includelib wsock32.lib
+includelib miglib.lib
 
 SetCurrentConsoleFontEx PROTO STDCALL :DWORD, :DWORD, :DWORD
 

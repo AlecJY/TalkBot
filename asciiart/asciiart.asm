@@ -1,6 +1,6 @@
-Title project
+Title AsciiArt
 
-include project.inc
+include asciiart.inc
 
 ; AsciiArt PROTO, StrOffset : PTR BYTE
 Mind PROTO, number : BYTE
