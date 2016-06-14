@@ -16,3 +16,4 @@ AngerScore PROTO input : DWORD
 SadnessScore PROTO input : DWORD
 FearScore PROTO input : DWORD
 DisgustScore PROTO input : DWORD
+Average PROTO input : DWORD, count : DWORD

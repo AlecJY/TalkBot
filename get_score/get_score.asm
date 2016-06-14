@@ -62,6 +62,7 @@ GetEmoScore PROC input : DWORD, emo : DWORD
 		mov ebx, eax
 	
 	.ENDW
+	Average emo, count
 	ret
 GetEmoScore ENDP
 ;;; input1, input2, output can be aliases, does not affect the result of the function
@@ -70,11 +71,28 @@ AddScore PROC input1 : DWORD, input2 : DWORD, output : DWORD
 	fadd REAL4 PTR [input2]
 	fstp REAL4 ptr [output]
 	ret
-	
-	;movss xmm0, input1
-	;mulss xmm0, input2
-	;movd eax, xmm0
-AddScore ENDP	
+AddScore ENDP
+
+Average PROC input : DWORD, count : DWORD
+	push count
+	fld REAL4 PTR [input].EMOTION.happiness
+	fidiv esp
+	fstp REAL4 PTR [input].EMOTION.happiness
+	fld REAL4 PTR [input].EMOTION.anger
+	fidiv esp
+	fstp REAL4 PTR [input].EMOTION.anger
+	fld REAL4 PTR [input].EMOTION.sadness
+	fidiv esp
+	fstp REAL4 PTR [input].EMOTION.sadness
+	fld REAL4 PTR [input].EMOTION.sadness
+	fidiv esp
+	fstp REAL4 PTR [input].EMOTION.sadness
+	fld REAL4 PTR [input].EMOTION.disgust
+	fidiv esp
+	fstp REAL4 PTR [input].EMOTION.disgust
+	pop count
+	ret
+Average ENDP	
 	
 HappinessScore PROC USES ebx, input : DWORD
 	INVOKE malloc, 1024
