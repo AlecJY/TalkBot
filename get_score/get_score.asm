@@ -62,7 +62,7 @@ GetEmoScore PROC input : DWORD, emo : DWORD
 		mov ebx, eax
 	
 	.ENDW
-	INVOKE Average, emo, count
+	INVOKE Average, emo, counter
 	ret
 GetEmoScore ENDP
 ;;; input1, input2, output can be aliases, does not affect the result of the function
@@ -76,19 +76,19 @@ AddScore ENDP
 Average PROC input : DWORD, count : DWORD
 	push count
 	fld REAL4 PTR [input].EMOTION.happiness
-	fidiv esp
+	fidiv [esp]
 	fstp REAL4 PTR [input].EMOTION.happiness
 	fld REAL4 PTR [input].EMOTION.anger
-	fidiv esp
+	fidiv [esp]
 	fstp REAL4 PTR [input].EMOTION.anger
 	fld REAL4 PTR [input].EMOTION.sadness
-	fidiv esp
+	fidiv [esp]
 	fstp REAL4 PTR [input].EMOTION.sadness
 	fld REAL4 PTR [input].EMOTION.sadness
-	fidiv esp
+	fidiv [esp]
 	fstp REAL4 PTR [input].EMOTION.sadness
 	fld REAL4 PTR [input].EMOTION.disgust
-	fidiv esp
+	fidiv [esp]
 	fstp REAL4 PTR [input].EMOTION.disgust
 	pop count
 	ret
