@@ -62,7 +62,7 @@ GetEmoScore PROC input : DWORD, emo : DWORD
 		mov ebx, eax
 	
 	.ENDW
-	Average emo, count
+	INVOKE Average, emo, count
 	ret
 GetEmoScore ENDP
 ;;; input1, input2, output can be aliases, does not affect the result of the function
