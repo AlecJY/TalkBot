@@ -2,6 +2,7 @@ Title AsciiArt
 
 include asciiart.inc
 include get_score.inc
+include fuzzySystem.inc
 
 Mind PROTO, number : BYTE
 
@@ -107,9 +108,9 @@ repe cmpsb				;examine bye string
 jz L4
 
 mov esi, StrOffset
-push eax
 INVOKE GetEmoScore, esi, ADDR InputStruct
-pop eax
+INVOKE fuzzySystem, ADDR InputStruct
+INVOKE Mind, al
 
 INVOKE Mind, al
 jmp LEND

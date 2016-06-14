@@ -56,27 +56,28 @@ FuzzySystem PROC USES ebx ecx edi esi,
     emotions:DWORD
     LOCAL strArray[15]:REAL4, sum:REAL4, tstr:REAL4, ans:DWORD
 
-    xor esi, esi
+    xor edi, edi
     xor ebx, ebx
 
     mov ecx, 5
-L1: push ecx
-    mov ecx, 3
+L1: 
+	push ecx
+	mov ecx, 3
     xor esi, esi
-L2: push ecx
-    
+L2: 
+	push ecx
     INVOKE GuassMFunc, REAL4 PTR emotions[ebx*4], medianArray[esi]
-
-    mov strArray[edi], eax
+	pop ecx
+	
+    mov strArray[edi*4], eax
     
     inc esi
     inc edi
     loop L2
     pop ecx
 
-    inc ebx    
+    inc ebx
     loop L1
-    pop ecx
 
     xor eax, eax
     mov tstr, eax
@@ -86,10 +87,11 @@ L2: push ecx
     mov ecx, 5
     xor esi, esi
     mov ebx, 2
-L3: push ecx
+L3: 
     xor edi, edi
     fld1
-L4: push ecx
+	push ecx
+L4: 
     
     .IF esi == edi
         push esi
@@ -127,10 +129,11 @@ L4: push ecx
     mov ecx, 5
     xor esi, esi
     mov ebx, 1
-L5: push ecx
+L5: 
     xor edi, edi
     fld1
-L6: push ecx
+	push ecx
+L6: 
     
     .IF esi == edi
         push esi
@@ -168,10 +171,11 @@ L6: push ecx
     mov ecx, 5
     xor esi, esi
     mov ebx, 1
-L7: push ecx
+L7: 
     xor edi, edi
     fld1
-L8: push ecx
+	push ecx
+L8: 
     
     .IF esi == edi
         push esi
