@@ -11,6 +11,11 @@ SET LINKER=%TOOLKITPATH%\LINK.exe
 SET LINKERPARAM=/debug /subsystem:console /entry:main /out:%ENTRY%.exe /LIBPATH:%TOOLKITPATH% /LIBPATH:%COMPILEPATH%\lib %INCLUDELIBS%
 SET TESTLINKERPARAM=/debug /subsystem:console /entry:main /out:%TESTENTRY%.exe /LIBPATH:%TOOLKITPATH% /LIBPATH:%COMPILEPATH%\lib %INCLUDELIBS%
 SET COMMONINCLUDE=/I%COMPILEPATH%\common
+if exist %ENTRY%.obj del %ENTRY%.obj
+if exist %ENTRY%.exe del %ENTRY%.exe
+if exist %ENTRY%.lst del %ENTRY%.lst
+if exist %ENTRY%.ilk del %ENTRY%.ilk
+if exist %ENTRY%.pdb del %ENTRY%.pdb
 echo submodule tokenization
 cmd /C tokenization\make.bat
 echo submoudle get_score
