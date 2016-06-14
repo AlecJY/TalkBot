@@ -4,7 +4,13 @@ INCLUDE get_score.inc
 INCLUDE miglib.inc	
 .data
 emoDB DB "emo.ini", 0
-listnewfailedmsg DB "TokenListNew Failed", 0	
+listnewfailedmsg DB "TokenListNew Failed", 0
+happinessStr DB "happiness", 0
+angerStr DB "anger", 0
+sadnessStr DB "sadness", 0
+fearStr DB "fear", 0
+disgustStr DB "disgust", 0
+
 .code
 
 GetEmoScore PROC input : DWORD, emo : DWORD
@@ -65,7 +71,7 @@ AddScore ENDP
 HappinessScore PROC USES ebx, input : DWORD
 	INVOKE malloc, 1024
 	mov ebx, eax
-	INVOKE GetPrivateProfileString, input, ADDR "happiness", 0, ebx, 1023, emoDB
+	INVOKE GetPrivateProfileString, input, ADDR happinessStr, 0, ebx, 1023, emoDB
 	.IF eax != 0
 		INVOKE atof, ebx
 		mov edi, eax
@@ -82,7 +88,7 @@ HappinessScore ENDP
 AngerScore PROC USES ebx, input : DWORD
 	INVOKE malloc, 1024
 	mov ebx, eax
-	INVOKE GetPrivateProfileString, input, "anger", 0, ebx, 1023, emoDB
+	INVOKE GetPrivateProfileString, input, angerStr, 0, ebx, 1023, emoDB
 	.IF eax != 0
 		INVOKE atof, ebx
 		mov edi, eax
@@ -99,7 +105,7 @@ AngerScore ENDP
 SadnessScore PROC USES ebx, input : DWORD
 	INVOKE malloc, 1024
 	mov ebx, eax
-	INVOKE GetPrivateProfileString, input, "sadness", 0, ebx, 1023, emoDB
+	INVOKE GetPrivateProfileString, input, sadnessStr, 0, ebx, 1023, emoDB
 	.IF eax != 0
 		INVOKE atof, ebx
 		mov edi, eax
@@ -116,7 +122,7 @@ SadnessScore ENDP
 FearScore PROC USES ebx, input : DWORD
 	INVOKE malloc, 1024
 	mov ebx, eax
-	INVOKE GetPrivateProfileString, input, "fear", 0, ebx, 1023, emoDB
+	INVOKE GetPrivateProfileString, input, fearStr, 0, ebx, 1023, emoDB
 	.IF eax != 0
 		INVOKE atof, ebx
 		mov edi, eax
@@ -133,7 +139,7 @@ FearScore ENDP
 DisgustScore PROC USES ebx, input : DWORD
 	INVOKE malloc, 1024
 	mov ebx, eax
-	INVOKE GetPrivateProfileString, input, "disgust", 0, ebx, 1023, emoDB
+	INVOKE GetPrivateProfileString, input, disgustStr, 0, ebx, 1023, emoDB
 	.IF eax != 0
 		INVOKE atof, ebx
 		mov edi, eax
