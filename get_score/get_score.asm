@@ -1,3 +1,4 @@
+.386
 INCLUDE crt.inc
 INCLUDE tokenization.inc
 INCLUDE get_score.inc
@@ -61,12 +62,14 @@ GetEmoScore PROC input : DWORD, emo : DWORD
 		mov ebx, eax
 	
 	.ENDW
+	ret
 GetEmoScore ENDP
 ;;; input1, input2, output can be aliases, does not affect the result of the function
 AddScore PROC input1 : DWORD, input2 : DWORD, output : DWORD
 	fld REAL4 PTR [input1]
 	fadd REAL4 PTR [input2]
-	fst REAL4 ptr [output]
+	fstp REAL4 ptr [output]
+	ret
 	
 	;movss xmm0, input1
 	;mulss xmm0, input2
@@ -76,7 +79,7 @@ AddScore ENDP
 HappinessScore PROC USES ebx, input : DWORD
 	INVOKE malloc, 1024
 	mov ebx, eax
-	INVOKE GetPrivateProfileString, input, ADDR happinessStr, 0, ebx, 1023, emoDB
+	INVOKE GetPrivateProfileString, input, ADDR happinessStr, 0, ebx, 1023, ADDR emoDB
 	.IF eax != 0
 		INVOKE atof, ebx
 		mov edi, eax
@@ -93,7 +96,7 @@ HappinessScore ENDP
 AngerScore PROC USES ebx, input : DWORD
 	INVOKE malloc, 1024
 	mov ebx, eax
-	INVOKE GetPrivateProfileString, input, angerStr, 0, ebx, 1023, emoDB
+	INVOKE GetPrivateProfileString, input, ADDR angerStr, 0, ebx, 1023, ADDR emoDB
 	.IF eax != 0
 		INVOKE atof, ebx
 		mov edi, eax
@@ -110,7 +113,7 @@ AngerScore ENDP
 SadnessScore PROC USES ebx, input : DWORD
 	INVOKE malloc, 1024
 	mov ebx, eax
-	INVOKE GetPrivateProfileString, input, sadnessStr, 0, ebx, 1023, emoDB
+	INVOKE GetPrivateProfileString, input, ADDR sadnessStr, 0, ebx, 1023, ADDR emoDB
 	.IF eax != 0
 		INVOKE atof, ebx
 		mov edi, eax
@@ -127,7 +130,7 @@ SadnessScore ENDP
 FearScore PROC USES ebx, input : DWORD
 	INVOKE malloc, 1024
 	mov ebx, eax
-	INVOKE GetPrivateProfileString, input, fearStr, 0, ebx, 1023, emoDB
+	INVOKE GetPrivateProfileString, input, ADDR fearStr, 0, ebx, 1023, ADDR emoDB
 	.IF eax != 0
 		INVOKE atof, ebx
 		mov edi, eax
@@ -144,7 +147,7 @@ FearScore ENDP
 DisgustScore PROC USES ebx, input : DWORD
 	INVOKE malloc, 1024
 	mov ebx, eax
-	INVOKE GetPrivateProfileString, input, disgustStr, 0, ebx, 1023, emoDB
+	INVOKE GetPrivateProfileString, input, ADDR disgustStr, 0, ebx, 1023, ADDR emoDB
 	.IF eax != 0
 		INVOKE atof, ebx
 		mov edi, eax

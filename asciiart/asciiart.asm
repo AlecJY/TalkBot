@@ -107,7 +107,9 @@ repe cmpsb				;examine bye string
 jz L4
 
 mov esi, StrOffset
+push eax
 INVOKE GetEmoScore, esi, ADDR InputStruct
+pop eax
 
 INVOKE Mind, al
 jmp LEND
