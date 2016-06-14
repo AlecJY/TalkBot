@@ -1,5 +1,3 @@
-.386
-.MODEL flat, stdcall
 .data
 EMOTION STRUCT
 	happiness REAL4 ?

@@ -1,7 +1,8 @@
 INCLUDE crt.inc
 INCLUDE tokenization.inc
 INCLUDE get_score.inc
-INCLUDE miglib.inc	
+INCLUDE miglib.inc
+
 .data
 emoDB DB "emo.ini", 0
 listnewfailedmsg DB "TokenListNew Failed", 0
@@ -63,9 +64,13 @@ GetEmoScore PROC input : DWORD, emo : DWORD
 GetEmoScore ENDP
 ;;; input1, input2, output can be aliases, does not affect the result of the function
 AddScore PROC input1 : DWORD, input2 : DWORD, output : DWORD
-	movss xmm0, input1
-	mulss xmm0, input2
-	movd eax, xmm0
+	fld REAL4 PTR [input1]
+	fadd REAL4 PTR [input2]
+	fst REAL4 ptr [output]
+	
+	;movss xmm0, input1
+	;mulss xmm0, input2
+	;movd eax, xmm0
 AddScore ENDP	
 	
 HappinessScore PROC USES ebx, input : DWORD
