@@ -4,7 +4,7 @@ INCLUDE fuzzySystem.inc
 exp PROC,
     x:REAL4
     
-    movzx eax, 256
+    mov eax, 256
     push eax
     fld x
     fild dword ptr[esp]
@@ -34,22 +34,22 @@ GuassMFunc PROC,
     fmul
     fchs
     
-    movzx eax, 1
+    mov eax, 1
     push eax
     fild dword ptr[esp]
     fdiv
     fst dword ptr[esp]
     
     call exp
-    pop
+    add esp, 4
     ret
 GuassMFunc ENDP
 
 .data
 medianArray REAL4  0,3,5
-LOW = 0
-MID = 1
-HIGH = 2
+LOW_MOOD = 0
+MID_MOOD = 1
+HIGH_MOOD = 2
 
 .code
 FuzzySystem PROC USES ebx ecx edi esi,
@@ -59,9 +59,9 @@ FuzzySystem PROC USES ebx ecx edi esi,
     xor esi, esi
     xor ebx, ebx
 
-    movzx ecx, 5
+    mov ecx, 5
 L1: push ecx
-    movzx ecx, 3
+    mov ecx, 3
     xor esi, esi
 L2: push ecx
     
@@ -83,24 +83,34 @@ L2: push ecx
     mov sum, eax
 
 ;RULE 1 cae
-    movzx ecx, 5
+    mov ecx, 5
     xor esi, esi
-    movzx ebx, 2
+    mov ebx, 2
 L3: push ecx
     xor edi, edi
     fld1
 L4: push ecx
     
     .IF esi == edi
-        fmul strArray[esi * 3 + HIGH]kk
+        push esi
+        imul esi, 12
+        add esi, HIGH_MOOD * 4
+        fmul strArray[esi]
+        pop esi
     .ELSE 
-        fmul strArray[esi * 3 + LOW]
+        push esi
+        imul esi, 12
+        add esi, LOW_MOOD * 4
+        fmul strArray[esi]
+        pop esi
     .ENDIF
 
     inc edi
     loop L4
     fst st(1)
-    fild ebx
+    push ebx
+    fild DWORD PTR [esp]
+    pop ebx
     fld sum
     fadd
     fstp sum
@@ -114,24 +124,34 @@ L4: push ecx
     loop L3
     
 ;RULE 2 case
-    movzx ecx, 5
+    mov ecx, 5
     xor esi, esi
-    movzx ebx, 1
+    mov ebx, 1
 L5: push ecx
     xor edi, edi
     fld1
 L6: push ecx
     
     .IF esi == edi
-        fmul strArray[esi * 3 + MID]
+        push esi
+        imul esi, 12
+        add esi, MID_MOOD * 4
+        fmul strArray[esi]
+        pop esi
     .ELSE 
-        fmul strArray[esi * 3 + LOW]
+        push esi
+        imul esi, 12
+        add esi, LOW_MOOD * 4
+        fmul strArray[esi]
+        pop esi
     .ENDIF
 
     inc edi
     loop L6
     fst st(1)
-    fild ebx
+    push ebx
+    fild DWORD PTR [esp]
+    pop ebx
     fld sum
     fadd
     fstp sum
@@ -145,24 +165,34 @@ L6: push ecx
     loop L5
 
 ;RULE 3 case
-    movzx ecx, 5
+    mov ecx, 5
     xor esi, esi
-    movzx ebx, 1
+    mov ebx, 1
 L7: push ecx
     xor edi, edi
     fld1
 L8: push ecx
     
     .IF esi == edi
-        fmul strArray[esi * 3 + HIGH]
+        push esi
+        imul esi, 12
+        add esi, HIGH_MOOD * 4
+        fmul strArray[esi]
+        pop esi
     .ELSE 
-        fmul strArray[esi * 3 + MID]
+        push esi
+        imul esi, 12
+        add esi, MID_MOOD * 4
+        fmul strArray[esi]
+        pop esi
     .ENDIF
 
     inc edi
     loop L8
     fst st(1)
-    fild ebx
+    push ebx
+    fild DWORD PTR [esp]
+    pop ebx
     fld sum
     fadd
     fstp sum
@@ -185,3 +215,4 @@ L8: push ecx
     ret
 
 FuzzySystem ENDP
+END
