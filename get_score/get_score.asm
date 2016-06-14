@@ -69,26 +69,26 @@ GetEmoScore ENDP
 AddScore PROC input1 : DWORD, input2 : DWORD, output : DWORD
 	fld REAL4 PTR [input1]
 	fadd REAL4 PTR [input2]
-	fstp REAL4 ptr [output]
+	fstp REAL4 PTR [output]
 	ret
 AddScore ENDP
 
 Average PROC input : DWORD, count : DWORD
 	push count
 	fld REAL4 PTR [input].EMOTION.happiness
-	fidiv [esp]
+	fidiv REAL4 PTR [esp]
 	fstp REAL4 PTR [input].EMOTION.happiness
 	fld REAL4 PTR [input].EMOTION.anger
-	fidiv [esp]
+	fidiv REAL4 PTR [esp]
 	fstp REAL4 PTR [input].EMOTION.anger
 	fld REAL4 PTR [input].EMOTION.sadness
-	fidiv [esp]
+	fidiv REAL4 PTR [esp]
 	fstp REAL4 PTR [input].EMOTION.sadness
 	fld REAL4 PTR [input].EMOTION.sadness
-	fidiv [esp]
+	fidiv REAL4 PTR [esp]
 	fstp REAL4 PTR [input].EMOTION.sadness
 	fld REAL4 PTR [input].EMOTION.disgust
-	fidiv [esp]
+	fidiv REAL4 PTR [esp]
 	fstp REAL4 PTR [input].EMOTION.disgust
 	pop count
 	ret
