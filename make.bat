@@ -22,5 +22,7 @@ echo submoudle get_score
 cmd /C get_score\make.bat
 echo submodule asciiart
 cmd /C asciiart\make.bat
+echo submodule fuzzySystem
+cmd /C fuzzySystem\make.bat
 echo Running main
 cmd /C socket\make.bat
