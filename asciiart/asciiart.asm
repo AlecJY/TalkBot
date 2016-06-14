@@ -1,8 +1,8 @@
 Title AsciiArt
 
 include asciiart.inc
+include get_score.inc
 
-; AsciiArt PROTO, StrOffset : PTR BYTE
 Mind PROTO, number : BYTE
 
 .data
@@ -71,7 +71,7 @@ scared1 BYTE "Σ( ° △ °|||)︴",0
 scared2 BYTE "(⊙ˍ⊙)",0
 mad1	BYTE "(╬ﾟдﾟ)▄︻┻┳═一",0
 mad2	BYTE "(#`Д´)ﾉ",0
-; InputStruct EMOTION <>
+InputStruct EMOTION <>
 
 .code
 
@@ -107,8 +107,8 @@ repe cmpsb				;examine bye string
 jz L4
 
 mov esi, StrOffset
-; INVOKE GetEmoScore, esi, InputStruct
-;*****學長procedure********
+INVOKE GetEmoScore, esi, ADDR InputStruct
+
 INVOKE Mind, al
 jmp LEND
 
