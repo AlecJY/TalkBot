@@ -2,6 +2,8 @@
 .model flat, stdcall
 option casemap:none
 
+include ..\project\project.inc
+
 include \masm32\include\kernel32.inc
 include \masm32\include\windows.inc
 include \masm32\include\masm32.inc
@@ -197,7 +199,7 @@ LineProcessProc PROC
 			.if eax > 0
 				pop eax
 				invoke GetMsg, eax
-				invoke EchoMsg, eax
+				invoke AsciiArt, eax
 				mov RetrivedMsg, eax
 				push eax
 				invoke szLen, RetrivedMsg
@@ -405,6 +407,7 @@ CharLoop:
 	.elseif eax == ln
 		inc edx
 		.if ecx == 1
+			inc esi
 			jmp LineToMemory
 		.endif
 	.endif
@@ -426,7 +429,7 @@ LineToMemory:
 	pop edx
 	push eax
 	dec edx
-	mov esi, message
+	sub esi, edx
 	mov edi, eax
 	mov ecx, edx
 	rep movsb

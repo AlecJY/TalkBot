@@ -1,8 +1,8 @@
 Title project
 
-INCLUDE Irvine32.inc
+include project.inc
 
-AsciiArt PROTO, StrOffset : PTR BYTE
+; AsciiArt PROTO, StrOffset : PTR BYTE
 Mind PROTO, number : BYTE
 
 .data
@@ -10,58 +10,49 @@ Mind PROTO, number : BYTE
 hello BYTE "Hi Alice",0
 exam BYTE "There are many exams tomorrow",0
 bye BYTE "Good bye Alice",0
-pic1 BYTE "　　　▌　▀▀▄▄　　　　　　▄▄▀▀▀　█  ",0dh,0ah
-	 BYTE "　　　█▓　　▀▄▄　　　▄▄▓▀　　▄▄▀   ",0dh,0ah
-	 BYTE "　　　　▀▀▀▀▀▀　　　　　▀▀▀▀▀      ",0dh,0ah
-	 BYTE "　　　　　　▄▄▄▄▄▄▄▄▄▄▄▄▄          ",0dh,0ah
-	 BYTE "　　　　　　█▀▄　▄　▄▄　　▄█       ",0dh,0ah
-	 BYTE "　　　　　▄█　▀▄▀▀▄▀　█　▀█        ",0dh,0ah
-	 BYTE "　　　　　█▌　　　　　　　　　　█  ",0dh,0ah
-	 BYTE "　　　　　█　█　　█▄　█　　█　　█  ",0dh,0ah
-	 BYTE "　　　　　██▄█▄█▄▄▀ █▄▀▄█  ▀▄█     ",0dh,0ah
-	 BYTE "　　　　　█▀　　▀▀　▀　　▀▀　　██  ",0dh,0ah
-	 BYTE "　　　　▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀     ",0
-pic2 BYTE "　　　▄▄▄▄▄▄▄▄▄▄       ",0dh,0ah
-	 BYTE "　　　███▀▀▀▀▀███▌     ",0dh,0ah
-	 BYTE "　　　███　　　　███   ",0dh,0ah
-	 BYTE "　　　███　　　　██▌　　██▌　　　　　　███　　▄███████▄ ",0dh,0ah
-	 BYTE "　　　███▄▄▄▄▄▄██▀　　▀██▌　　　　██▌　　▄██▀　　　██   ",0dh,0ah
-	 BYTE "　　　████▀▀▀▀▀▀██▌▄　　▀██▄　　██▌　　███▄▄▄▄▄▄▄██▌    ",0dh,0ah
-	 BYTE "　　　███　　　　███▄　　　　███▄　██▌　　████▀▀▀▀▀▀▀█▀ ",0dh,0ah
-	 BYTE "　　　███　　　　███　　　　　███▄██▌　　　██▌          ",0dh,0ah
-	 BYTE "　　　███▌▄▄▄▄▄████　　　　████▌　　　　　████▄▄▄███▌   ",0dh,0ah
-	 BYTE "　　　█▀██▀█▀▀▀▀　　　　　　　██▌　　　　　　▀▀██▀▀██   ",0dh,0ah
-	 BYTE "　　　　　　　　　　　　　　　　　███                   ",0dh,0ah
-	 BYTE "　　　　　　　　　　　　　　　　　███                   ",0
-pic3 BYTE "　　　███　　　███　　　▄▄▄",0dh,0ah
-	 BYTE "　　　███　　　███　　　███",0dh,0ah
-	 BYTE "　　　███　　　███　　　　　",0dh,0ah
-	 BYTE "　　　██████████　　　███  ",0dh,0ah
-	 BYTE "　　　███　　　███　　　███",0dh,0ah
-	 BYTE "　　　███　　　███　　　███",0dh,0ah
-	 BYTE "　　　███　　　███　　　███",0
-happy1 BYTE "　(ﾉ>ω<)ﾉ ",0
-happy2 BYTE "　ヽ(✿ﾟ▽ﾟ)ノ",0
-angry1 BYTE "　ヽ(`Д´)ノ",0
-angry2 BYTE "　(#`皿´)",0
-sad1   BYTE "　◢▆▅▄▃崩╰(〒皿〒)╯潰▃▄▅",0
-sad2   BYTE "　(╥﹏╥)",0
-scared1 BYTE "　Σ( ° △ °|||)︴",0
-scared2 BYTE "　(⊙ˍ⊙)",0
-mad1	BYTE "　(╬ﾟдﾟ)▄︻┻┳═一",0
-mad2	BYTE "　(#`Д´)ﾉ",0
-InputStruct EMOTION <>
+pic1 BYTE "░░░░░░▌░░▀▀▄▄░░░░░░░░░░░░▄▄▀▀▀░░█  ",0dh,0ah
+	 BYTE "░░░░░░█▓░░░░▀▄▄░░░░░░▄▄▓▀░░░░▄▄▀   ",0dh,0ah
+	 BYTE "░░░░░░░░▀▀▀▀▀▀░░░░░░░░░░▀▀▀▀▀      ",0dh,0ah
+	 BYTE "░░░░░░░░░░░░▄▄▄▄▄▄▄▄▄▄▄▄▄          ",0dh,0ah
+	 BYTE "░░░░░░░░░░░░█▀▄░░▄░░▄▄░░░░▄█       ",0dh,0ah
+	 BYTE "░░░░░░░░░░▄█░░▀▄▀▀▄▀░░█░░▀█        ",0dh,0ah
+	 BYTE "░░░░░░░░░░█▌░░░░░░░░░░░░░░░░░░░░█  ",0dh,0ah
+	 BYTE "░░░░░░░░░░█░░█░░░░█▄░░█░░░░█░░░░█  ",0dh,0ah
+	 BYTE "░░░░░░░░░░██▄█▄█▄▄▀ █▄▀▄█  ▀▄█     ",0dh,0ah
+	 BYTE "░░░░░░░░░░█▀░░░░▀▀░░▀░░░░▀▀░░░░██  ",0dh,0ah
+	 BYTE "░░░░░░░░▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀     ",0
+pic2 BYTE "░░░░░░▄▄▄▄▄▄▄▄▄▄       ",0dh,0ah
+	 BYTE "░░░░░░███▀▀▀▀▀███▌     ",0dh,0ah
+	 BYTE "░░░░░░███░░░░░░░░███   ",0dh,0ah
+	 BYTE "░░░░░░███░░░░░░░░██▌░░░░██▌░░░░░░░░░░░░███░░░░▄███████▄ ",0dh,0ah
+	 BYTE "░░░░░░███▄▄▄▄▄▄██▀░░░░▀██▌░░░░░░░░██▌░░░░▄██▀░░░░░░██   ",0dh,0ah
+	 BYTE "░░░░░░████▀▀▀▀▀▀██▌▄░░░░▀██▄░░░░██▌░░░░███▄▄▄▄▄▄▄██▌    ",0dh,0ah
+	 BYTE "░░░░░░███░░░░░░░░███▄░░░░░░░░███▄░░██▌░░░░████▀▀▀▀▀▀▀█▀ ",0dh,0ah
+	 BYTE "░░░░░░███░░░░░░░░███░░░░░░░░░░███▄██▌░░░░░░██▌          ",0dh,0ah
+	 BYTE "░░░░░░███▌▄▄▄▄▄████░░░░░░░░████▌░░░░░░░░░░████▄▄▄███▌   ",0dh,0ah
+	 BYTE "░░░░░░█▀██▀█▀▀▀▀░░░░░░░░░░░░░░██▌░░░░░░░░░░░░▀▀██▀▀██   ",0dh,0ah
+	 BYTE "░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░███                   ",0dh,0ah
+	 BYTE "░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░███                   ",0
+pic3 BYTE "░░░░░░███░░░░░░███░░░░░░▄▄▄",0dh,0ah
+	 BYTE "░░░░░░███░░░░░░███░░░░░░███",0dh,0ah
+	 BYTE "░░░░░░███░░░░░░███░░░░░░░░░░",0dh,0ah
+	 BYTE "░░░░░░██████████░░░░░░███  ",0dh,0ah
+	 BYTE "░░░░░░███░░░░░░███░░░░░░███",0dh,0ah
+	 BYTE "░░░░░░███░░░░░░███░░░░░░███",0dh,0ah
+	 BYTE "░░░░░░███░░░░░░███░░░░░░███",0
+happy1 BYTE "(ﾉ>ω<)ﾉ ",0
+happy2 BYTE "ヽ(✿ﾟ▽ﾟ)ノ",0
+angry1 BYTE "ヽ(`Д´)ノ",0
+angry2 BYTE "(#`皿´)",0
+sad1   BYTE "◢▆▅▄▃崩╰(〒皿〒)╯潰▃▄▅",0
+sad2   BYTE "(╥﹏╥)",0
+scared1 BYTE "Σ( ° △ °|||)︴",0
+scared2 BYTE "(⊙ˍ⊙)",0
+mad1	BYTE "(╬ﾟдﾟ)▄︻┻┳═一",0
+mad2	BYTE "(#`Д´)ﾉ",0
+; InputStruct EMOTION <>
 
-main EQU start@0
 .code
-main PROC
-
-;INVOKE AsciiArt, OFFSET exam
-INVOKE Mind, 9
-mov edx,eax
-call WriteString
-
-main ENDP
 
 ;parameter is StrOffset to match hello or exam or bye string
 AsciiArt PROC USES ecx esi edi, StrOffset : PTR BYTE	 
@@ -87,10 +78,10 @@ cld
 repe cmpsb				;examine bye string
 jz L3
 
-movzx esi, StrOffset
-INVOKE GetEmoScore, esi, InputStruct
+mov esi, StrOffset
+; INVOKE GetEmoScore, esi, InputStruct
 ;*****學長procedure********
-INVOKE Mind, eax
+INVOKE Mind, al
 jmp LEND
 
 L1:
@@ -164,7 +155,7 @@ MEND:
 ret
 Mind ENDP
 
-END main
+END
 
 
 
