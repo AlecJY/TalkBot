@@ -36,23 +36,23 @@ GetEmoScore PROC input : DWORD, emo : DWORD
 		push eax
 		INVOKE HappinessScore, eax
 		push eax
-		INVOKE AddScore, esp, [emo].EMOTION.happiness, [emo].EMOTION.happiness
+		INVOKE AddScore, esp, ADDR [emo].EMOTION.happiness, ADDR [emo].EMOTION.happiness
 		add esp, 4
 		INVOKE AngerScore, eax
 		push eax
-		INVOKE AddScore, esp, [emo].EMOTION.anger, [emo].EMOTION.anger
+		INVOKE AddScore, esp, ADDR [emo].EMOTION.anger, ADDR [emo].EMOTION.anger
 		add esp, 4
 		INVOKE SadnessScore, eax
 		push eax
-		INVOKE AddScore, esp, [emo].EMOTION.sadness, [emo].EMOTION.sadness
+		INVOKE AddScore, esp, ADDR [emo].EMOTION.sadness, ADDR [emo].EMOTION.sadness
 		add esp, 4
 		INVOKE FearScore, eax
 		push eax
-		INVOKE AddScore, esp, [emo].EMOTION.fear, [emo].EMOTION.fear
+		INVOKE AddScore, esp, ADDR [emo].EMOTION.fear, ADDR [emo].EMOTION.fear
 		add esp, 4
 		INVOKE DisgustScore, eax
 		push eax
-		INVOKE AddScore, esp, [emo].EMOTION.disgust, [emo].EMOTION.disgust
+		INVOKE AddScore, esp, ADDR [emo].EMOTION.disgust, ADDR [emo].EMOTION.disgust
 		add esp, 8	;also pops out tokWrod
 		inc counter
 		INVOKE TokenListCursorNext, edi
