@@ -20,6 +20,7 @@ GetEmoScore PROC input : DWORD, emo : DWORD
 	mov counter, 0
 	INVOKE memset, emo, 0, SIZEOF EMOTION
 	INVOKE TokenListNew
+	sub esp, 8
 	push eax
 	.IF eax != 0
 		INVOKE Tokenize, eax, input
@@ -63,6 +64,7 @@ GetEmoScore PROC input : DWORD, emo : DWORD
 	
 	.ENDW
 	INVOKE Average, emo, counter
+	add esp, 8
 	ret
 GetEmoScore ENDP
 ;;; input1, input2, output can be aliases, does not affect the result of the function
