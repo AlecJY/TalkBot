@@ -5,22 +5,23 @@ INCLUDE get_score.inc
 INCLUDE miglib.inc
 
 .data
-emoDB DB "emo.ini", 0
+emoDB DB ".\emo.ini", 0
 listnewfailedmsg DB "TokenListNew Failed", 0
 happinessStr DB "happiness", 0
 angerStr DB "anger", 0
 sadnessStr DB "sadness", 0
 fearStr DB "fear", 0
 disgustStr DB "disgust", 0
+CRLF BYTE 0dh, 0ah, 0
 
 .code
 
 GetEmoScore PROC input : DWORD, emo : DWORD
-	LOCAL counter
+	LOCAL counter, score
+	int 3
 	mov counter, 0
 	INVOKE memset, emo, 0, SIZEOF EMOTION
 	INVOKE TokenListNew
-	sub esp, 8
 	push eax
 	.IF eax != 0
 		INVOKE Tokenize, eax, input
@@ -30,33 +31,43 @@ GetEmoScore PROC input : DWORD, emo : DWORD
 		INVOKE exit, 0
 	.ENDIF
 	pop eax
+	push eax
+	INVOKE TokenListCursorNew, eax
+	mov edi, eax 		; save cursor in edi
+	INVOKE TokenListCursorGetItem, edi
+	mov ebx, eax
+	.WHILE ebx != 0
+		INVOKE PrintToken, ebx
+		INVOKE printf, ADDR CRLF
+		INVOKE TokenListCursorNext, edi
+		INVOKE TokenListCursorGetItem, edi
+		mov ebx, eax
+	.ENDW
+	pop eax
 	INVOKE TokenListCursorNew, eax
 	mov edi, eax
 	INVOKE TokenListCursorGetItem, edi
+	mov esi, emo
 	mov ebx, eax
 	.WHILE ebx != 0
 		mov eax, [ebx].TOKEN.tokWord
 		push eax
 		INVOKE HappinessScore, eax
-		push eax
-		INVOKE AddScore, esp, ADDR [emo].EMOTION.happiness, ADDR [emo].EMOTION.happiness
-		add esp, 4
+		mov score, eax
+		INVOKE AddScore, score, ADDR [esi].EMOTION.happiness, ADDR [esi].EMOTION.happiness
 		INVOKE AngerScore, eax
-		push eax
-		INVOKE AddScore, esp, ADDR [emo].EMOTION.anger, ADDR [emo].EMOTION.anger
-		add esp, 4
+		mov score, eax
+		INVOKE AddScore, score, ADDR [esi].EMOTION.anger, ADDR [esi].EMOTION.anger
 		INVOKE SadnessScore, eax
-		push eax
-		INVOKE AddScore, esp, ADDR [emo].EMOTION.sadness, ADDR [emo].EMOTION.sadness
-		add esp, 4
+		mov score, eax
+		INVOKE AddScore, score, ADDR [esi].EMOTION.sadness, ADDR [esi].EMOTION.sadness
 		INVOKE FearScore, eax
-		push eax
-		INVOKE AddScore, esp, ADDR [emo].EMOTION.fear, ADDR [emo].EMOTION.fear
-		add esp, 4
+		mov score, eax
+		INVOKE AddScore, score, ADDR [esi].EMOTION.fear, ADDR [esi].EMOTION.fear
 		INVOKE DisgustScore, eax
-		push eax
-		INVOKE AddScore, esp, ADDR [emo].EMOTION.disgust, ADDR [emo].EMOTION.disgust
-		add esp, 8	;also pops out tokWrod
+		mov score, eax
+		INVOKE AddScore, score, ADDR [esi].EMOTION.disgust, ADDR [esi].EMOTION.disgust
+		add esp, 4	;also pops out tokWrod
 		inc counter
 		INVOKE TokenListCursorNext, edi
 		INVOKE TokenListCursorGetItem, edi
@@ -64,7 +75,6 @@ GetEmoScore PROC input : DWORD, emo : DWORD
 	
 	.ENDW
 	INVOKE Average, emo, counter
-	add esp, 8
 	ret
 GetEmoScore ENDP
 ;;; input1, input2, output can be aliases, does not affect the result of the function
@@ -77,21 +87,27 @@ AddScore ENDP
 
 Average PROC input : DWORD, count : DWORD
 	push count
-	fld REAL4 PTR [input].EMOTION.happiness
-	fidiv REAL4 PTR [esp]
-	fstp REAL4 PTR [input].EMOTION.happiness
-	fld REAL4 PTR [input].EMOTION.anger
-	fidiv REAL4 PTR [esp]
-	fstp REAL4 PTR [input].EMOTION.anger
-	fld REAL4 PTR [input].EMOTION.sadness
-	fidiv REAL4 PTR [esp]
-	fstp REAL4 PTR [input].EMOTION.sadness
-	fld REAL4 PTR [input].EMOTION.sadness
-	fidiv REAL4 PTR [esp]
-	fstp REAL4 PTR [input].EMOTION.sadness
-	fld REAL4 PTR [input].EMOTION.disgust
-	fidiv REAL4 PTR [esp]
-	fstp REAL4 PTR [input].EMOTION.disgust
+	mov eax, input
+	fld  REAL4 PTR [eax].EMOTION.happiness
+	fidiv DWORD PTR [esp]
+	fstp REAL4 PTR [eax].EMOTION.happiness
+	
+	fld REAL4 PTR [eax].EMOTION.anger
+	fidiv DWORD PTR [esp]
+	fstp REAL4 PTR [eax].EMOTION.anger
+	
+	fld REAL4 PTR [eax].EMOTION.sadness
+	fidiv DWORD PTR [esp]
+	fstp REAL4 PTR [eax].EMOTION.sadness
+	
+	fld REAL4 PTR [eax].EMOTION.fear
+	fidiv DWORD PTR [esp]
+	fstp REAL4 PTR [eax].EMOTION.fear
+	
+	fld REAL4 PTR [eax].EMOTION.disgust
+	fidiv DWORD PTR [esp]
+	fstp REAL4 PTR [eax].EMOTION.disgust
+	
 	pop count
 	ret
 Average ENDP	
@@ -102,9 +118,10 @@ HappinessScore PROC USES ebx edi, input : DWORD
 	INVOKE GetPrivateProfileString, input, ADDR happinessStr, 0, ebx, 1023, ADDR emoDB
 	.IF eax != 0
 		INVOKE atof, ebx
-		mov edi, eax
+		sub esp, 4
+		fstp REAL4 PTR [esp]
 		INVOKE free, ebx
-		mov eax, edi
+		pop eax
 		ret
 	.ELSE
 		INVOKE free, ebx
@@ -119,9 +136,10 @@ AngerScore PROC USES ebx edi, input : DWORD
 	INVOKE GetPrivateProfileString, input, ADDR angerStr, 0, ebx, 1023, ADDR emoDB
 	.IF eax != 0
 		INVOKE atof, ebx
-		mov edi, eax
+		sub esp, 4
+		fstp REAL4 PTR [esp]
 		INVOKE free, ebx
-		mov eax, edi
+		pop eax
 		ret
 	.ELSE
 		INVOKE free, ebx
@@ -136,9 +154,10 @@ SadnessScore PROC USES ebx edi, input : DWORD
 	INVOKE GetPrivateProfileString, input, ADDR sadnessStr, 0, ebx, 1023, ADDR emoDB
 	.IF eax != 0
 		INVOKE atof, ebx
-		mov edi, eax
+		sub esp, 4
+		fstp REAL4 PTR [esp]
 		INVOKE free, ebx
-		mov eax, edi
+		pop eax
 		ret
 	.ELSE
 		INVOKE free, ebx
@@ -153,9 +172,10 @@ FearScore PROC USES ebx edi, input : DWORD
 	INVOKE GetPrivateProfileString, input, ADDR fearStr, 0, ebx, 1023, ADDR emoDB
 	.IF eax != 0
 		INVOKE atof, ebx
-		mov edi, eax
+		sub esp, 4
+		fstp REAL4 PTR [esp]
 		INVOKE free, ebx
-		mov eax, edi
+		pop eax
 		ret
 	.ELSE
 		INVOKE free, ebx
@@ -170,9 +190,10 @@ DisgustScore PROC USES ebx edi, input : DWORD
 	INVOKE GetPrivateProfileString, input, ADDR disgustStr, 0, ebx, 1023, ADDR emoDB
 	.IF eax != 0
 		INVOKE atof, ebx
-		mov edi, eax
+		sub esp, 4
+		fstp REAL4 PTR [esp]
 		INVOKE free, ebx
-		mov eax, edi
+		pop eax
 		ret
 	.ELSE
 		INVOKE free, ebx

@@ -17,8 +17,14 @@ TokenListDelete PROC list : DWORD
 	mov eax, list
 	.WHILE eax != 0
 		mov eax, [eax].TOKEN_LIST.head
+		mov eax, [eax]
+		.IF eax == 0
+			.BREAK
+		.ENDIF
 		mov ecx, [eax].TOKEN_LIST_BODY.item
+		push eax
 		INVOKE TokenDelete, ecx
+		pop eax
 		mov ecx, [eax].TOKEN_LIST_BODY.next
 		INVOKE free, eax
 		mov eax, ecx
@@ -31,26 +37,19 @@ TokenListAppend PROC USES ebx, list : DWORD, tok : DWORD
 	.IF [ecx].TOKEN_LIST.head == 0
 		push ecx
 		INVOKE malloc, SIZEOF TOKEN_LIST_BODY
-		.IF eax == 0
-			jmp TokenListAppendError
-		.ENDIF
 		push eax
 		INVOKE memset, eax, 0, SIZEOF TOKEN_LIST_BODY
 		pop eax
 		pop ecx
 		mov [ecx].TOKEN_LIST.head, eax
 		mov [ecx].TOKEN_LIST.tail, eax
-		lea eax, [eax].TOKEN_LIST_BODY.item
-		mov edx, tok
-		mov [eax], edx
+		mov ebx, tok
+		mov [eax].TOKEN_LIST_BODY.item, ebx
 	.ELSE
 		;; insert from tail
 	
 		push ecx
 		INVOKE malloc, SIZEOF TOKEN_LIST_BODY
-		.IF eax == 0
-			jmp TokenListAppendError
-		.ENDIF
 		INVOKE memset, eax, 0, SIZEOF TOKEN_LIST_BODY
 		pop ecx
 		mov ebx, [ecx].TOKEN_LIST.tail
@@ -63,9 +62,6 @@ TokenListAppend PROC USES ebx, list : DWORD, tok : DWORD
 TokenListAppendExit:
 	mov eax, 0
 	ret
-TokenListAppendError:
-	mov eax, 1
-	ret
 TokenListAppend ENDP	
 
 TokenNew PROC USES ebx, input : DWORD, len : DWORD
@@ -73,10 +69,16 @@ TokenNew PROC USES ebx, input : DWORD, len : DWORD
 	.IF eax == 0
 		ret
 	.ENDIF
+	mov ecx, len
+	inc ecx
+	push ecx
 	mov ebx, eax
-	INVOKE calloc, 1, len + 1
+	INVOKE malloc, ecx
+	pop ecx
+	INVOKE memset, eax, 0, ecx
 	.IF eax == 0
 		INVOKE free, ebx
+		mov eax, 0
 		ret
 	.ENDIF
 	INVOKE memcpy, eax, input, len
@@ -139,7 +141,13 @@ TokenListCursorNext PROC cursor : DWORD
 TokenListCursorNext ENDP
 
 Tokenize PROC USES ebx edi, list : DWORD, input : PTR BYTE
-	mov ebx, input
+	INVOKE strlen, input
+	inc eax
+	push eax
+	INVOKE malloc, eax
+	pop ebx
+	INVOKE memcpy, eax, input, ebx
+	mov ebx, eax
 	.IF ebx == 0
 		ret
 	.ELSE
@@ -153,6 +161,7 @@ Tokenize PROC USES ebx edi, list : DWORD, input : PTR BYTE
 			INVOKE strtok, 0, ADDR spc
 		.ENDW
 	.ENDIF
+	INVOKE free, ebx
 	ret
 Tokenize ENDP	
 

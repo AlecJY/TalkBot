@@ -9,7 +9,7 @@ SET ASSEMBLER=%TOOLKITPATH%\ML.exe
 SET ASSEMBLERPARAM=/c /coff /Zi /Fl
 SET LINKER=%TOOLKITPATH%\LINK.exe
 SET LINKERPARAM=/debug /subsystem:console /entry:main /out:%ENTRY%.exe /LIBPATH:%TOOLKITPATH% /LIBPATH:%COMPILEPATH%\lib %INCLUDELIBS%
-SET TESTLINKERPARAM=/debug /subsystem:console /entry:main /out:%TESTENTRY%.exe /LIBPATH:%TOOLKITPATH% /LIBPATH:%COMPILEPATH%\lib %INCLUDELIBS%
+SET TESTLINKERPARAM=/debug /subsystem:console /entry:%TESTENTRY% /out:%TESTENTRY%.exe /LIBPATH:%TOOLKITPATH% /LIBPATH:%COMPILEPATH%\lib %INCLUDELIBS%
 SET COMMONINCLUDE=/I%COMPILEPATH%\common
 if exist %ENTRY%.obj del %ENTRY%.obj
 if exist %ENTRY%.exe del %ENTRY%.exe
@@ -26,3 +26,5 @@ echo submodule fuzzySystem
 cmd /C fuzzySystem\make.bat
 echo Running main
 cmd /C socket\make.bat
+echo Running tests
+cmd /C test\make.bat
