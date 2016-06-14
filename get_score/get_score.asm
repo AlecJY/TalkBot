@@ -94,7 +94,7 @@ Average PROC input : DWORD, count : DWORD
 	ret
 Average ENDP	
 	
-HappinessScore PROC USES ebx, input : DWORD
+HappinessScore PROC USES ebx edi, input : DWORD
 	INVOKE malloc, 1024
 	mov ebx, eax
 	INVOKE GetPrivateProfileString, input, ADDR happinessStr, 0, ebx, 1023, ADDR emoDB
@@ -111,7 +111,7 @@ HappinessScore PROC USES ebx, input : DWORD
 	.ENDIF
 HappinessScore ENDP
 
-AngerScore PROC USES ebx, input : DWORD
+AngerScore PROC USES ebx edi, input : DWORD
 	INVOKE malloc, 1024
 	mov ebx, eax
 	INVOKE GetPrivateProfileString, input, ADDR angerStr, 0, ebx, 1023, ADDR emoDB
@@ -128,7 +128,7 @@ AngerScore PROC USES ebx, input : DWORD
 	.ENDIF
 AngerScore ENDP
 
-SadnessScore PROC USES ebx, input : DWORD
+SadnessScore PROC USES ebx edi, input : DWORD
 	INVOKE malloc, 1024
 	mov ebx, eax
 	INVOKE GetPrivateProfileString, input, ADDR sadnessStr, 0, ebx, 1023, ADDR emoDB
@@ -145,7 +145,7 @@ SadnessScore PROC USES ebx, input : DWORD
 	.ENDIF
 SadnessScore ENDP
 
-FearScore PROC USES ebx, input : DWORD
+FearScore PROC USES ebx edi, input : DWORD
 	INVOKE malloc, 1024
 	mov ebx, eax
 	INVOKE GetPrivateProfileString, input, ADDR fearStr, 0, ebx, 1023, ADDR emoDB
@@ -162,7 +162,7 @@ FearScore PROC USES ebx, input : DWORD
 	.ENDIF
 FearScore ENDP
 
-DisgustScore PROC USES ebx, input : DWORD
+DisgustScore PROC USES ebx edi, input : DWORD
 	INVOKE malloc, 1024
 	mov ebx, eax
 	INVOKE GetPrivateProfileString, input, ADDR disgustStr, 0, ebx, 1023, ADDR emoDB
