@@ -12,6 +12,7 @@ hello BYTE "Hi Alice",0
 exam BYTE "There are many exams tomorrow",0
 bye BYTE "Good bye Alice",0
 onepiece BYTE "I want to be a king of pirates",0
+default BYTE "ヽ(=^･ω･^=)丿",0
 pic1 BYTE "█▄▄░░░░░░░░░░░░░░░░░░░░▄█▀█",0dh,0ah
 	 BYTE "▌░░▀▀▄▄░░░░░░░░░░░░▄▄▀▀▀░█░",0dh,0ah
 	 BYTE "█▓░░░░▀▄▄░░░░░░▄▄▓▀░░░▄▄▀░░",0dh,0ah
@@ -153,6 +154,7 @@ cmp ebx, 9		;mad1
 je M9
 cmp ebx, 10		;mad2
 je M10
+mov eax, OFFSET default
 jmp MEND
 M1:
 	mov eax, OFFSET happy1

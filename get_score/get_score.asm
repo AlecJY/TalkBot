@@ -53,6 +53,9 @@ GetEmoScore PROC USES ebx edi esi, input : DWORD, emo : DWORD
 		mov eax, [ebx].TOKEN.tokWord
 		push eax
 		INVOKE HappinessScore, eax
+		.IF eax == 0
+			jmp cont
+		.ENDIF
 		mov score, eax
 		INVOKE AddScore, ADDR score, ADDR [esi].EMOTION.happiness, ADDR [esi].EMOTION.happiness
 		mov eax, [esp]
@@ -73,6 +76,7 @@ GetEmoScore PROC USES ebx edi esi, input : DWORD, emo : DWORD
 		INVOKE AddScore, ADDR score, ADDR [esi].EMOTION.disgust, ADDR [esi].EMOTION.disgust
 		add esp, 4	;pops out tokWrod
 		inc counter
+cont:
 		INVOKE TokenListCursorNext, edi
 		INVOKE TokenListCursorGetItem, edi
 		mov ebx, eax
@@ -93,6 +97,9 @@ AddScore PROC USES eax ecx edx, input1 : DWORD, input2 : DWORD, output : DWORD
 AddScore ENDP
 
 Average PROC input : DWORD, count : DWORD
+	.IF count == 0
+		ret
+	.ENDIF		
 	push count
 	mov eax, input
 	fld  REAL4 PTR [eax].EMOTION.happiness
