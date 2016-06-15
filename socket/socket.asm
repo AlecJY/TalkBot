@@ -285,7 +285,10 @@ ReadConfig PROC USES ebx ecx edx esi edi
 	;read config
 	invoke StdOut, ADDR loadCFG
 	invoke filesize, ADDR iniPath
-	.if eax < 0
+	.if eax <= 0
+		invoke StdOut, ADDR cfgReadError
+		invoke ExitProcess, -1
+	.elseif eax == 0ffffffffh
 		invoke StdOut, ADDR cfgReadError
 		invoke ExitProcess, -1
 	.endif

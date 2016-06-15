@@ -1,7 +1,7 @@
 @echo off
-SET TOOLKITPATH=%1
 SET COMPILEPATH=%~dp0
 SET OUTPUTPATH=%~dp0
+SET TOOLKITPATH=%COMPILEPATH%\bin
 SET ENTRY=talkbot
 SET TESTENTRY=test_main
 SET INCLUDELIBS=Kernel32.lib user32.lib msvcrt.lib miglib.lib
