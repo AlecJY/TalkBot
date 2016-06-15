@@ -108,11 +108,10 @@ repe cmpsb				;examine bye string
 jz L4
 
 mov esi, StrOffset
-INVOKE GetEmoScore, esi, ADDR InputStruct
-INVOKE fuzzySystem, ADDR InputStruct
-INVOKE Mind, al
+; INVOKE GetEmoScore, esi, ADDR InputStruct
+; INVOKE fuzzySystem, ADDR InputStruct
+; INVOKE Mind, al
 
-INVOKE Mind, al
 jmp LEND
 
 L1:
