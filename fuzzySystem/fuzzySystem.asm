@@ -65,7 +65,7 @@ L10:idiv ebx
     ret
 MYDECODE ENDP
 
-MYCHECK PROC USE esi edx ecx ebx, deArray:PTR DWORD
+MYCHECK PROC USES esi edx ecx ebx, deArray:PTR DWORD
     LOCAL maxVar:DWORD, minVar:DWORD, count:DWORD
     mov eax, 5
     mov minVar, eax
@@ -91,7 +91,7 @@ L13:
     mov ecx, 5
     xor esi, esi
 L14:
-    mov eax,DOWRD PTR deArray[esi]
+    mov eax,DWORD PTR deArray[esi]
     .IF eax == maxVar
         inc count
     .ENDIF
@@ -172,8 +172,8 @@ L12:
     inc esi
     loop L12
     pop ecx
+	loop L11
 
-    loop ecx
 
     fld sum
     fld tstr
