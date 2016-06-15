@@ -56,12 +56,13 @@ MYDECODE PROC USES esi edx ebx ecx, num:DWORD, deArray:PTR DWORD
     
     mov eax, num
     mov ebx, 3
-    mov esi, deArray
+    xor esi, esi
     mov ecx, 5
 L10:idiv ebx
-    mov DWORD PTR [esi], edx
+    mov DWORD PTR deArray[esi], edx
     add esi, TYPE DWORD
     loop L10
+    ret
 MYDECODE ENDP
 
 MYCHECK PROC USE esi edx ecx ebx, deArray:PTR DWORD
