@@ -35,10 +35,10 @@ GuassMFunc PROC,
     fmul
     fchs
     
-    mov eax, 1
+    mov eax, 4
     push eax
     fild dword ptr[esp]
-    fdiv
+    fmul
     fstp dword ptr[esp]
     
     call exp
@@ -236,6 +236,12 @@ L12:
 		fld tstr
 
 		fdiv
+		fld1
+		fld1
+		fld1
+		fadd
+		fdiv
+		fadd
 		fistp ans
 
 		mov eax, ans

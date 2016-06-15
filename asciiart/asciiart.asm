@@ -65,14 +65,14 @@ pic4 BYTE "░░▄▀▀▀▄░░░░░░░░░░▄▄▄▄▄▄
      BYTE "░░░▀▀▀░░░░░░░░░░░░▀▀▀▀░░░░░░░░░░░░░▀▀▀▀░░░░",0
 happy1 BYTE "(ﾉ>ω<)ﾉ ",0
 happy2 BYTE "ヽ(✿ﾟ▽ﾟ)ノ",0
-angry1 BYTE "ヽ(`Д´)ノ",0
+angry1 BYTE "(╬ﾟдﾟ)▄︻┻┳═一",0
 angry2 BYTE "(#`皿´)",0
 sad1   BYTE "◢▆▅▄▃崩╰(〒皿〒)╯潰▃▄▅",0
 sad2   BYTE "(╥﹏╥)",0
 scared1 BYTE "Σ( ° △ °|||)︴",0
 scared2 BYTE "(⊙ˍ⊙)",0
-mad1	BYTE "(╬ﾟдﾟ)▄︻┻┳═一",0
-mad2	BYTE "(#`Д´)ﾉ",0
+mad1	BYTE "うっ。。。(￣x￣;)",0
+mad2	BYTE "（;ﾟ;艸;ﾟ;）",0
 InputStruct EMOTION <>
 
 .code

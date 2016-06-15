@@ -29,7 +29,7 @@ PingPong PROTO :DWORD
 
 .data
 ; basicData
-CopyRight DB "TalkBot Alpha 2016-06-15", 13, 10, "https://github.com/petercommand/TalkBot",13, 10, "(C) 2016 TalkBot Team", 13, 10, 13, 10, 0
+CopyRight DB "TalkBot Alpha 2016-06-16", 13, 10, "https://github.com/petercommand/TalkBot",13, 10, "(C) 2016 TalkBot Team", 13, 10, 13, 10, 0
 SendCRLF DB 13, 10, 0
 SendSpace DB " ", 0
 
