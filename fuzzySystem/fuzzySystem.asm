@@ -52,9 +52,65 @@ MID_MOOD = 1
 HIGH_MOOD = 2
 
 .code
+MYDECODE PROC USES esi edx ebx ecx, num:DWORD, deArray:PTR DWORD
+    
+    mov eax, num
+    mov ebx, 3
+    mov esi, deArray
+    mov ecx, 5
+L10:idiv ebx
+    mov DWORD PTR [esi], edx
+    add esi, TYPE DWORD
+    loop L10
+MYDECODE ENDP
+
+MYCHECK PROC USE esi edx ecx ebx, deArray:PTR DWORD
+    LOCAL maxVar:DWORD, minVar:DWORD, count:DWORD
+    mov eax, 5
+    mov minVar, eax
+    xor eax, eax
+    mov maxVar, eax
+    mov count, eax
+    mov ecx, 5
+    mov esi, deArray
+L13:
+    mov eax, [esi]
+    .IF maxVar < eax
+        mov maxVar, eax
+    .ENDIF
+    .IF minVar > eax
+        mov minVar, eax
+    .ENDIF
+
+    add esi, TYPE DWORD
+
+    loop L13
+
+    mov ecx, 5
+    mov esi, deArray
+L14:
+    mov eax, [esi]
+    .IF eax == maxVar
+        inc count
+    .ENDIF
+    loop L14
+    
+    .IF count == 1
+        mov eax, maxVar
+        sub eax, minVar
+        ret
+    .ELSE
+        xor eax, eax
+        ret
+    .ENDIF
+
+MYCHECK ENDP 
+
+
+
 FuzzySystem PROC USES ebx ecx edi esi,
     emotions:DWORD
-    LOCAL strArray[15]:REAL4, sum:REAL4, tstr:REAL4, ans:DWORD
+    LOCAL strArray[15]:REAL4, sum:REAL4, tstr:REAL4, ans:DWORD, tmpArray[5]:DWORD
 
     xor edi, edi
     xor ebx, ebx
@@ -83,131 +139,39 @@ L2:
     mov tstr, eax
     mov sum, eax
 
-;RULE 1 cae
+
+    mov ecx, 243
+L11:INVOKE MYDECODE, ecx, ADDR tmpArray
+    push ecx
     mov ecx, 5
     xor esi, esi
-    mov ebx, 2
-L3: 
     xor edi, edi
     fld1
-	push ecx
-L4: 
-    
-    .IF esi == edi
-        push esi
-        imul esi, 12
-        add esi, HIGH_MOOD * 4
-        fmul strArray[esi]
-        pop esi
-    .ELSE 
-        push esi
-        imul esi, 12
-        add esi, LOW_MOOD * 4
-        fmul strArray[esi]
-        pop esi
-    .ENDIF
-
-    inc edi
-    loop L4
+L12:
+    push esi
+    mov edi, tmpArray[esi*4]
+    imul esi, 3
+    add esi, edi
+    fmul strArray[esi*4]
     fst st(1)
-    push ebx
-    fild DWORD PTR [esp]
-    pop ebx
-    fld sum
-    fadd
-    fstp sum
-    fld tstr
-    fadd
+    fadd tstr
     fstp tstr
-
-    add ebx, 2
-    pop ecx
-    inc esi
-    loop L3
     
-;RULE 2 case
-    mov ecx, 5
-    xor esi, esi
-    mov ebx, 1
-L5: 
-    xor edi, edi
-    fld1
-	push ecx
-L6: 
-    
-    .IF esi == edi
-        push esi
-        imul esi, 12
-        add esi, MID_MOOD * 4
-        fmul strArray[esi]
-        pop esi
-    .ELSE 
-        push esi
-        imul esi, 12
-        add esi, LOW_MOOD * 4
-        fmul strArray[esi]
-        pop esi
-    .ENDIF
 
-    inc edi
-    loop L6
-    fst st(1)
-    push ebx
-    fild DWORD PTR [esp]
-    pop ebx
-    fld sum
-    fadd
+    INVOKE MYCHECK, ADDR tmpArray
+    push eax
+    fimul DWORD PTR [esp]
+    pop eax
+    fadd sum
     fstp sum
-    fld tstr
-    fadd
-    fstp tstr
-
-    add ebx, 2
-    pop ecx
-    inc esi
-    loop L5
-
-;RULE 3 case
-    mov ecx, 5
-    xor esi, esi
-    mov ebx, 1
-L7: 
-    xor edi, edi
-    fld1
-	push ecx
-L8: 
     
-    .IF esi == edi
-        push esi
-        imul esi, 12
-        add esi, HIGH_MOOD * 4
-        fmul strArray[esi]
-        pop esi
-    .ELSE 
-        push esi
-        imul esi, 12
-        add esi, MID_MOOD * 4
-        fmul strArray[esi]
-        pop esi
-    .ENDIF
+    pop esi
 
-    inc edi
-    loop L8
-    fst st(1)
-    push ebx
-    fild DWORD PTR [esp]
-    pop ebx
-    fld sum
-    fadd
-    fstp sum
-    fld tstr
-    fadd
-    fstp tstr
-
-    add ebx, 2
-    pop ecx
     inc esi
-    loop L7
+    loop L12
+    pop ecx
+
+    loop ecx
 
     fld sum
     fld tstr
