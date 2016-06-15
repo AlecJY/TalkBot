@@ -58,7 +58,7 @@ PrivMsgCmd DB "PRIVMSG ", 0
 loadCFG DB "Loading account.ini...", 13, 10, 0
 
 ; Error Messages
-cfgReadError DB "Error: Cannot Read account.cfg", 13, 10, 0
+cfgReadError DB "Error: Cannot Read account.ini", 13, 10, 0
 mallocFailed DB "Error: Memory Allocate failed", 13, 10, 0
 sockStartError DB "Initialize socket failed", 13, 10, 0
 sockError DB "Send Package failed", 13, 10, 0
