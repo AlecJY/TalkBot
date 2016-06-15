@@ -72,9 +72,10 @@ MYCHECK PROC USE esi edx ecx ebx, deArray:PTR DWORD
     mov maxVar, eax
     mov count, eax
     mov ecx, 5
-    mov esi, deArray
+    xor esi, esi
 L13:
-    mov eax, [esi]
+
+    mov eax, DWORD PTR deArray[esi]
     .IF maxVar < eax
         mov maxVar, eax
     .ENDIF
@@ -87,9 +88,9 @@ L13:
     loop L13
 
     mov ecx, 5
-    mov esi, deArray
+    xor esi, esi
 L14:
-    mov eax, [esi]
+    mov eax,DOWRD PTR deArray[esi]
     .IF eax == maxVar
         inc count
     .ENDIF
