@@ -30,19 +30,7 @@ GetEmoScore PROC USES ebx edi esi, input : DWORD, emo : DWORD
 		INVOKE printf, ADDR listnewfailedmsg
 		INVOKE exit, 0
 	.ENDIF
-	pop eax
-	push eax
-	INVOKE TokenListCursorNew, eax
-	mov edi, eax 		; save cursor in edi
-	INVOKE TokenListCursorGetItem, edi
-	mov ebx, eax
-	.WHILE ebx != 0
-		INVOKE PrintToken, ebx
-		INVOKE printf, ADDR CRLF
-		INVOKE TokenListCursorNext, edi
-		INVOKE TokenListCursorGetItem, edi
-		mov ebx, eax
-	.ENDW
+
 	pop eax
 	INVOKE TokenListCursorNew, eax
 	mov edi, eax
